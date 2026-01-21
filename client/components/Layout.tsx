@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { useFinance } from "@/context/FinanceContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,17 +16,16 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { t, i18n } = useTranslation();
-  const { exportData, importData, clearData, data } = useFinance();
+  const { exportData, importData, clearData } = useFinance();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   const navItems = [
-    { path: "/", label: t("nav.home") },
-    { path: "/financial-input", label: t("nav.financial_input") },
-    { path: "/savings-strategies", label: t("nav.savings_strategies") },
-    { path: "/charts", label: t("nav.charts") },
-    { path: "/investment", label: t("nav.investment") },
+    { path: "/", label: "Home" },
+    { path: "/financial-input", label: "Financial Input" },
+    { path: "/savings-strategies", label: "Savings Strategies" },
+    { path: "/charts", label: "Analytics" },
+    { path: "/investment", label: "Investment Advice" },
   ];
 
   const handleExport = () => {
