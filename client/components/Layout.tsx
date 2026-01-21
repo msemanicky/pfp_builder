@@ -176,8 +176,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
-              <h3 className="font-semibold mb-4 text-foreground">{t("app.title")}</h3>
-              <p className="text-sm text-muted-foreground">{t("app.subtitle")}</p>
+              <h3 className="font-semibold mb-4 text-foreground">Personal Finance Planner</h3>
+              <p className="text-sm text-muted-foreground">Plan your finances with confidence</p>
             </div>
             <div>
               <h4 className="font-semibold mb-4 text-foreground">Quick Links</h4>
