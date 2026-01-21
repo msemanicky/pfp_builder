@@ -66,13 +66,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const handleClear = () => {
-    if (window.confirm(t("message.confirm_clear"))) {
+    if (window.confirm("This will clear all your financial data. Are you sure?")) {
       clearData();
     }
-  };
-
-  const handleLanguageChange = (lang: "en" | "es" | "fr" | "de") => {
-    i18n.changeLanguage(lang);
   };
 
   const isActive = (path: string) => {
