@@ -110,48 +110,25 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             {/* Action Buttons */}
             <div className="flex items-center gap-2">
-              {/* Language Selector */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" title={t("header.language")}>
-                    <Globe className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleLanguageChange("en")}>
-                    English
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLanguageChange("es")}>
-                    Español
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLanguageChange("fr")}>
-                    Français
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleLanguageChange("de")}>
-                    Deutsch
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
               {/* Data Actions */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" title={t("header.export")}>
+                  <Button variant="ghost" size="icon" title="Export/Import">
                     <Download className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={handleExport}>
                     <Download className="w-4 h-4 mr-2" />
-                    {t("header.export")}
+                    Export Data
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleImport}>
                     <Upload className="w-4 h-4 mr-2" />
-                    {t("header.import")}
+                    Import Data
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleClear} className="text-destructive">
                     <Trash2 className="w-4 h-4 mr-2" />
-                    {t("header.clear")}
+                    Clear Data
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
