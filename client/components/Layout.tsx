@@ -87,8 +87,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <span className="text-primary-foreground font-bold text-lg">₱</span>
               </div>
               <div className="hidden sm:flex flex-col">
-                <h1 className="text-lg font-bold text-foreground">{t("app.title")}</h1>
-                <p className="text-xs text-muted-foreground">{t("app.subtitle")}</p>
+                <h1 className="text-lg font-bold text-foreground">Personal Finance Planner</h1>
+                <p className="text-xs text-muted-foreground">Plan your finances with confidence</p>
               </div>
             </Link>
 
