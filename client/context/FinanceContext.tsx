@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { FinanceData, Income, Expense, Debt } from "@/types/finance";
-import { v4 as uuidv4 } from "crypto";
 
 interface FinanceContextType {
   data: FinanceData;
