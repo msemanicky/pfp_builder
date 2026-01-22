@@ -42,13 +42,13 @@ const Index: React.FC = () => {
         <div className="max-w-md mx-auto text-center">
           <div className="bg-muted/50 rounded-lg p-8 mb-6">
             <PieChart className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">{t("home.no_data")}</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-2">No financial data yet. Start by adding your income and expenses.</h2>
             <p className="text-muted-foreground text-sm mb-6">
-              {t("home.get_started")}
+              Get Started
             </p>
             <Link to="/financial-input">
               <Button size="lg" className="w-full">
-                {t("financial_input.add_income")}
+                Add Income
               </Button>
             </Link>
           </div>
