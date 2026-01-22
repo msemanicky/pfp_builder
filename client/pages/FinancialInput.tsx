@@ -132,15 +132,15 @@ const FinancialInput: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-foreground mb-2">{t("financial_input.title")}</h1>
-        <p className="text-lg text-muted-foreground">{t("financial_input.subtitle")}</p>
+        <h1 className="text-4xl font-bold text-foreground mb-2">Financial Input</h1>
+        <p className="text-lg text-muted-foreground">Manage your incomes, expenses, and debts</p>
       </div>
 
       <Tabs defaultValue="income" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-8">
-          <TabsTrigger value="income">{t("financial_input.incomes")}</TabsTrigger>
-          <TabsTrigger value="expense">{t("financial_input.expenses")}</TabsTrigger>
-          <TabsTrigger value="debt">{t("financial_input.debts")}</TabsTrigger>
+          <TabsTrigger value="income">Incomes</TabsTrigger>
+          <TabsTrigger value="expense">Expenses</TabsTrigger>
+          <TabsTrigger value="debt">Debts</TabsTrigger>
         </TabsList>
 
         {/* Income Tab */}
@@ -148,11 +148,11 @@ const FinancialInput: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <Card className="lg:col-span-1">
               <CardHeader>
-                <CardTitle>{editingIncomeId ? t("financial_input.edit") : t("financial_input.add_income")}</CardTitle>
+                <CardTitle>{editingIncomeId ? "Edit Income" : "Add Income"}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>{t("financial_input.name")}</Label>
+                  <Label>Name</Label>
                   <Input
                     value={incomeForm.name}
                     onChange={(e) => setIncomeForm({ ...incomeForm, name: e.target.value })}
@@ -160,7 +160,7 @@ const FinancialInput: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label>{t("financial_input.amount")}</Label>
+                  <Label>Amount</Label>
                   <Input
                     type="number"
                     value={incomeForm.amount}
@@ -169,7 +169,7 @@ const FinancialInput: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label>{t("financial_input.frequency")}</Label>
+                  <Label>Frequency</Label>
                   <Select value={incomeForm.frequency} onValueChange={(value) => setIncomeForm({ ...incomeForm, frequency: value })}>
                     <SelectTrigger>
                       <SelectValue />
@@ -177,7 +177,7 @@ const FinancialInput: React.FC = () => {
                     <SelectContent>
                       {frequency_options.map((freq) => (
                         <SelectItem key={freq} value={freq}>
-                          {t(`frequency.${freq}`)}
+                          {freq.charAt(0).toUpperCase() + freq.slice(1)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -186,7 +186,7 @@ const FinancialInput: React.FC = () => {
                 <div className="flex gap-2 pt-2">
                   <Button onClick={handleAddIncome} className="flex-1">
                     <Plus className="w-4 h-4 mr-2" />
-                    {editingIncomeId ? t("button.update") : t("button.add")}
+                    {editingIncomeId ? "Update" : "Add"}
                   </Button>
                   {editingIncomeId && (
                     <Button
@@ -196,7 +196,7 @@ const FinancialInput: React.FC = () => {
                       }}
                       variant="outline"
                     >
-                      {t("button.cancel")}
+                      Cancel
                     </Button>
                   )}
                 </div>
@@ -205,7 +205,7 @@ const FinancialInput: React.FC = () => {
 
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle>{t("financial_input.incomes")}</CardTitle>
+                <CardTitle>Incomes</CardTitle>
                 <CardDescription>Total: {data.incomes.length} income source(s)</CardDescription>
               </CardHeader>
               <CardContent>
@@ -215,7 +215,7 @@ const FinancialInput: React.FC = () => {
                       <div className="flex-1">
                         <p className="font-medium text-foreground">{income.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          ${income.amount.toFixed(2)} {t(`frequency.${income.frequency}`)}
+                          ${income.amount.toFixed(2)} {income.frequency.charAt(0).toUpperCase() + income.frequency.slice(1)}
                         </p>
                       </div>
                       <div className="flex gap-2">
@@ -250,11 +250,11 @@ const FinancialInput: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <Card className="lg:col-span-1">
               <CardHeader>
-                <CardTitle>{editingExpenseId ? t("financial_input.edit") : t("financial_input.add_expense")}</CardTitle>
+                <CardTitle>{editingExpenseId ? "Edit Expense" : "Add Expense"}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>{t("financial_input.name")}</Label>
+                  <Label>Name</Label>
                   <Input
                     value={expenseForm.name}
                     onChange={(e) => setExpenseForm({ ...expenseForm, name: e.target.value })}
@@ -262,7 +262,7 @@ const FinancialInput: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label>{t("financial_input.amount")}</Label>
+                  <Label>Amount</Label>
                   <Input
                     type="number"
                     value={expenseForm.amount}
@@ -271,7 +271,7 @@ const FinancialInput: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label>{t("financial_input.category")}</Label>
+                  <Label>Category</Label>
                   <Select value={expenseForm.category} onValueChange={(value) => setExpenseForm({ ...expenseForm, category: value })}>
                     <SelectTrigger>
                       <SelectValue />
@@ -279,14 +279,14 @@ const FinancialInput: React.FC = () => {
                     <SelectContent>
                       {category_options.map((cat) => (
                         <SelectItem key={cat} value={cat}>
-                          {t(`category.${cat}`)}
+                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>{t("financial_input.frequency")}</Label>
+                  <Label>Frequency</Label>
                   <Select value={expenseForm.frequency} onValueChange={(value) => setExpenseForm({ ...expenseForm, frequency: value })}>
                     <SelectTrigger>
                       <SelectValue />
@@ -294,7 +294,7 @@ const FinancialInput: React.FC = () => {
                     <SelectContent>
                       {frequency_options.map((freq) => (
                         <SelectItem key={freq} value={freq}>
-                          {t(`frequency.${freq}`)}
+                          {freq.charAt(0).toUpperCase() + freq.slice(1)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -303,7 +303,7 @@ const FinancialInput: React.FC = () => {
                 <div className="flex gap-2 pt-2">
                   <Button onClick={handleAddExpense} className="flex-1">
                     <Plus className="w-4 h-4 mr-2" />
-                    {editingExpenseId ? t("button.update") : t("button.add")}
+                    {editingExpenseId ? "Update" : "Add"}
                   </Button>
                   {editingExpenseId && (
                     <Button
@@ -313,7 +313,7 @@ const FinancialInput: React.FC = () => {
                       }}
                       variant="outline"
                     >
-                      {t("button.cancel")}
+                      Cancel
                     </Button>
                   )}
                 </div>
@@ -322,7 +322,7 @@ const FinancialInput: React.FC = () => {
 
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle>{t("financial_input.expenses")}</CardTitle>
+                <CardTitle>Expenses</CardTitle>
                 <CardDescription>Total: {data.expenses.length} expense(s)</CardDescription>
               </CardHeader>
               <CardContent>
@@ -332,7 +332,7 @@ const FinancialInput: React.FC = () => {
                       <div className="flex-1">
                         <p className="font-medium text-foreground">{expense.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          ${expense.amount.toFixed(2)} {t(`frequency.${expense.frequency}`)} • {t(`category.${expense.category}`)}
+                          ${expense.amount.toFixed(2)} {expense.frequency.charAt(0).toUpperCase() + expense.frequency.slice(1)} • {expense.category.charAt(0).toUpperCase() + expense.category.slice(1)}
                         </p>
                       </div>
                       <div className="flex gap-2">
@@ -367,11 +367,11 @@ const FinancialInput: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <Card className="lg:col-span-1">
               <CardHeader>
-                <CardTitle>{editingDebtId ? t("financial_input.edit") : t("financial_input.add_debt")}</CardTitle>
+                <CardTitle>{editingDebtId ? "Edit Debt" : "Add Debt"}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>{t("financial_input.name")}</Label>
+                  <Label>Name</Label>
                   <Input
                     value={debtForm.name}
                     onChange={(e) => setDebtForm({ ...debtForm, name: e.target.value })}
@@ -388,7 +388,7 @@ const FinancialInput: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label>{t("financial_input.interest_rate")}</Label>
+                  <Label>Interest Rate (%)</Label>
                   <Input
                     type="number"
                     value={debtForm.interestRate}
@@ -398,7 +398,7 @@ const FinancialInput: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label>{t("financial_input.monthly_payment")}</Label>
+                  <Label>Monthly Payment</Label>
                   <Input
                     type="number"
                     value={debtForm.monthlyPayment}
@@ -407,7 +407,7 @@ const FinancialInput: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label>{t("financial_input.remaining_months")}</Label>
+                  <Label>Remaining Months</Label>
                   <Input
                     type="number"
                     value={debtForm.remainingMonths}
@@ -418,7 +418,7 @@ const FinancialInput: React.FC = () => {
                 <div className="flex gap-2 pt-2">
                   <Button onClick={handleAddDebt} className="flex-1">
                     <Plus className="w-4 h-4 mr-2" />
-                    {editingDebtId ? t("button.update") : t("button.add")}
+                    {editingDebtId ? "Update" : "Add"}
                   </Button>
                   {editingDebtId && (
                     <Button
@@ -428,7 +428,7 @@ const FinancialInput: React.FC = () => {
                       }}
                       variant="outline"
                     >
-                      {t("button.cancel")}
+                      Cancel
                     </Button>
                   )}
                 </div>
@@ -437,7 +437,7 @@ const FinancialInput: React.FC = () => {
 
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle>{t("financial_input.debts")}</CardTitle>
+                <CardTitle>Debts</CardTitle>
                 <CardDescription>Total: {data.debts.length} debt(s)</CardDescription>
               </CardHeader>
               <CardContent>
