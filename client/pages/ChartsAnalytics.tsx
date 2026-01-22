@@ -52,21 +52,21 @@ const ChartsAnalytics: React.FC = () => {
   // Income vs Expenses Chart Data
   const incomeVsExpensesData = [
     {
-      name: t("nav.home"),
-      [t("home.total_income")]: totalMonthlyIncome,
-      [t("home.total_expenses")]: totalMonthlyExpenses,
-      [t("charts.debt_payoff")]: totalMonthlyDebtPayment,
+      name: "Home",
+      "Total Income": totalMonthlyIncome,
+      "Total Expenses": totalMonthlyExpenses,
+      "Debt Payoff": totalMonthlyDebtPayment,
     },
   ];
 
   // Monthly Breakdown Data
   const monthlyBreakdownData = [
     {
-      name: t("home.total_income"),
+      name: "Total Income",
       value: totalMonthlyIncome,
     },
     {
-      name: t("home.total_expenses"),
+      name: "Total Expenses",
       value: totalMonthlyExpenses,
     },
     {
@@ -74,7 +74,7 @@ const ChartsAnalytics: React.FC = () => {
       value: totalMonthlyDebtPayment,
     },
     {
-      name: t("home.total_savings"),
+      name: "Total Savings",
       value: Math.max(0, monthlyAvailableSavings),
     },
   ];
@@ -118,13 +118,13 @@ const ChartsAnalytics: React.FC = () => {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">{t("charts.title")}</h1>
-          <p className="text-lg text-muted-foreground">{t("charts.subtitle")}</p>
-        </div>
+        <h1 className="text-4xl font-bold text-foreground mb-2">Analytics & Charts</h1>
+        <p className="text-lg text-muted-foreground">Visualize your financial data</p>
+      </div>
 
         <Card className="bg-muted/50 border-0">
           <CardHeader>
-            <CardTitle>{t("home.no_data")}</CardTitle>
+            <CardTitle>No Data</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
@@ -139,15 +139,15 @@ const ChartsAnalytics: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-foreground mb-2">{t("charts.title")}</h1>
-        <p className="text-lg text-muted-foreground">{t("charts.subtitle")}</p>
+        <h1 className="text-4xl font-bold text-foreground mb-2">Analytics & Charts</h1>
+        <p className="text-lg text-muted-foreground">Visualize your financial data</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Income vs Expenses */}
         <Card>
           <CardHeader>
-            <CardTitle>{t("charts.income_vs_expenses")}</CardTitle>
+            <CardTitle>Income vs Expenses</CardTitle>
             <CardDescription>Monthly breakdown</CardDescription>
           </CardHeader>
           <CardContent>
@@ -158,9 +158,9 @@ const ChartsAnalytics: React.FC = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey={t("home.total_income")} fill="#0F7173" />
-                <Bar dataKey={t("home.total_expenses")} fill="#FF6B6B" />
-                <Bar dataKey={t("charts.debt_payoff")} fill="#FFD700" />
+                <Bar dataKey="Total Income" fill="#0F7173" />
+                <Bar dataKey="Total Expenses" fill="#FF6B6B" />
+                <Bar dataKey="Debt Payoff" fill="#FFD700" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -169,7 +169,7 @@ const ChartsAnalytics: React.FC = () => {
         {/* Monthly Breakdown Pie */}
         <Card>
           <CardHeader>
-            <CardTitle>{t("charts.monthly_breakdown")}</CardTitle>
+            <CardTitle>Monthly Breakdown</CardTitle>
             <CardDescription>Proportion of income allocation</CardDescription>
           </CardHeader>
           <CardContent>
@@ -200,7 +200,7 @@ const ChartsAnalytics: React.FC = () => {
         {/* Short-term Savings Projection */}
         <Card>
           <CardHeader>
-            <CardTitle>{t("charts.short_term_savings")}</CardTitle>
+            <CardTitle>Short-term Savings Projection</CardTitle>
             <CardDescription>Next 3 months projection</CardDescription>
           </CardHeader>
           <CardContent>
@@ -220,7 +220,7 @@ const ChartsAnalytics: React.FC = () => {
         {/* Long-term Savings Projection */}
         <Card>
           <CardHeader>
-            <CardTitle>{t("charts.long_term_savings")}</CardTitle>
+            <CardTitle>Long-term Savings Projection</CardTitle>
             <CardDescription>Next 12 months projection</CardDescription>
           </CardHeader>
           <CardContent>
@@ -243,7 +243,7 @@ const ChartsAnalytics: React.FC = () => {
           {/* Debt Payoff Timeline */}
           <Card>
             <CardHeader>
-              <CardTitle>{t("charts.debt_payoff")}</CardTitle>
+              <CardTitle>Debt Payoff Timeline</CardTitle>
               <CardDescription>Months remaining for each debt</CardDescription>
             </CardHeader>
             <CardContent>
@@ -265,7 +265,7 @@ const ChartsAnalytics: React.FC = () => {
       {expenseByCategory.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>{t("charts.expense_breakdown")}</CardTitle>
+            <CardTitle>Expense Breakdown</CardTitle>
             <CardDescription>Monthly expenses by category</CardDescription>
           </CardHeader>
           <CardContent>
@@ -276,7 +276,7 @@ const ChartsAnalytics: React.FC = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ category, value }) => `${t(`category.${category}`)}: $${value.toFixed(0)}`}
+                  label={({ category, value }) => `${category.charAt(0).toUpperCase() + category.slice(1)}: $${value.toFixed(0)}`}
                   outerRadius={120}
                   fill="#8884d8"
                   dataKey="value"
