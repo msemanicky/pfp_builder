@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import { useFinance } from "@/context/FinanceContext";
 import { Button } from "@/components/ui/button";
@@ -16,16 +17,17 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const { t } = useTranslation();
   const { exportData, importData, clearData } = useFinance();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   const navItems = [
-    { path: "/", label: "Home" },
-    { path: "/financial-input", label: "Financial Input" },
-    { path: "/savings-strategies", label: "Savings Strategies" },
-    { path: "/charts", label: "Analytics" },
-    { path: "/investment", label: "Investment Advice" },
+    { path: "/", label: t("nav.home") },
+    { path: "/financial-input", label: t("nav.financial_input") },
+    { path: "/savings-strategies", label: t("nav.savings_strategies") },
+    { path: "/charts", label: t("nav.charts") },
+    { path: "/investment", label: t("nav.investment") },
   ];
 
   const handleExport = () => {
@@ -66,7 +68,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const handleClear = () => {
-    if (window.confirm("This will clear all your financial data. Are you sure?")) {
+    if (window.confirm(t("message.confirm_clear"))) {
       clearData();
     }
   };
@@ -87,8 +89,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <span className="text-primary-foreground font-bold text-lg">₱</span>
               </div>
               <div className="hidden sm:flex flex-col">
-                <h1 className="text-lg font-bold text-foreground">Personal Finance Planner</h1>
-                <p className="text-xs text-muted-foreground">Plan your finances with confidence</p>
+                <h1 className="text-lg font-bold text-foreground">{t("app.title")}</h1>
+                <p className="text-xs text-muted-foreground">{t("app.subtitle")}</p>
               </div>
             </Link>
 
@@ -120,15 +122,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={handleExport}>
                     <Download className="w-4 h-4 mr-2" />
-                    Export Data
+                    {t("header.export")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleImport}>
                     <Upload className="w-4 h-4 mr-2" />
-                    Import Data
+                    {t("header.import")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleClear} className="text-destructive">
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Clear Data
+                    {t("header.clear")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -176,8 +178,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
-              <h3 className="font-semibold mb-4 text-foreground">Personal Finance Planner</h3>
-              <p className="text-sm text-muted-foreground">Plan your finances with confidence</p>
+              <h3 className="font-semibold mb-4 text-foreground">{t("app.title")}</h3>
+              <p className="text-sm text-muted-foreground">{t("app.subtitle")}</p>
             </div>
             <div>
               <h4 className="font-semibold mb-4 text-foreground">Quick Links</h4>
