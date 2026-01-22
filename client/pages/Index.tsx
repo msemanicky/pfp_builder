@@ -33,8 +33,8 @@ const Index: React.FC = () => {
     <div className="container mx-auto px-4 py-12">
       {/* Hero Section */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-foreground mb-2">{t("home.title")}</h1>
-        <p className="text-lg text-muted-foreground">{t("home.welcome")}</p>
+        <h1 className="text-4xl font-bold text-foreground mb-2">Financial Dashboard</h1>
+        <p className="text-lg text-muted-foreground">Welcome to your financial planner</p>
       </div>
 
       {!hasData ? (
