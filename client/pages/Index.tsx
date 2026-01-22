@@ -158,11 +158,11 @@ const Index: React.FC = () => {
                   <p className="text-sm text-muted-foreground mb-1">Monthly Summary</p>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm">{t("home.total_income")}</span>
+                      <span className="text-sm">Total Income</span>
                       <span className="font-semibold text-success">${totalMonthlyIncome.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm">{t("home.total_expenses")}</span>
+                      <span className="text-sm">Total Expenses</span>
                       <span className="font-semibold text-destructive">-${totalMonthlyExpenses.toFixed(2)}</span>
                     </div>
                     {totalMonthlyDebtPayment > 0 && (
@@ -172,7 +172,7 @@ const Index: React.FC = () => {
                       </div>
                     )}
                     <div className="border-t border-border pt-2 flex justify-between">
-                      <span className="text-sm font-medium">{t("home.total_savings")}</span>
+                      <span className="text-sm font-medium">Total Savings</span>
                       <span className={`font-bold text-lg ${availableSavings >= 0 ? 'text-success' : 'text-destructive'}`}>
                         ${availableSavings.toFixed(2)}
                       </span>
