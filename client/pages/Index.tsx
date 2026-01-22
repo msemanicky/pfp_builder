@@ -90,7 +90,7 @@ const Index: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
-                  {t("home.total_savings")}
+                  Available Savings
                   <TrendingUp className="w-4 h-4 text-warning" />
                 </CardTitle>
               </CardHeader>
@@ -105,7 +105,7 @@ const Index: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {t("home.savings_rate")}
+                  Savings Rate
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -122,7 +122,7 @@ const Index: React.FC = () => {
             <Card className="cursor-pointer hover:border-primary transition-colors">
               <Link to="/financial-input">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{t("home.quick_insights")}</CardTitle>
+                  <CardTitle className="text-base">Quick Insights</CardTitle>
                   <CardDescription>Manage your data</CardDescription>
                 </CardHeader>
               </Link>
@@ -131,7 +131,7 @@ const Index: React.FC = () => {
             <Card className="cursor-pointer hover:border-primary transition-colors">
               <Link to="/savings-strategies">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{t("savings_strategies.title")}</CardTitle>
+                  <CardTitle className="text-base">Savings Strategies</CardTitle>
                   <CardDescription>Choose a strategy</CardDescription>
                 </CardHeader>
               </Link>
@@ -140,7 +140,7 @@ const Index: React.FC = () => {
             <Card className="cursor-pointer hover:border-primary transition-colors">
               <Link to="/charts">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{t("charts.title")}</CardTitle>
+                  <CardTitle className="text-base">Financial Analytics</CardTitle>
                   <CardDescription>View analytics</CardDescription>
                 </CardHeader>
               </Link>
@@ -150,7 +150,7 @@ const Index: React.FC = () => {
           {/* Summary Information */}
           <Card>
             <CardHeader>
-              <CardTitle>{t("home.quick_insights")}</CardTitle>
+              <CardTitle>Quick Insights</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -185,7 +185,7 @@ const Index: React.FC = () => {
                     <p className="text-sm text-muted-foreground mb-3">Get started by adding your first income:</p>
                     <Link to="/financial-input" className="w-full block">
                       <Button variant="outline" className="w-full">
-                        {t("financial_input.add_income")}
+                        Add Income
                       </Button>
                     </Link>
                   </div>
