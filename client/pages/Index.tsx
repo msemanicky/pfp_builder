@@ -60,7 +60,7 @@ const Index: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
-                  {t("home.total_income")}
+                  Total Income
                   <ArrowUpRight className="w-4 h-4 text-success" />
                 </CardTitle>
               </CardHeader>
