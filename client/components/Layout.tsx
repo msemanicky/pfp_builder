@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import { useFinance } from "@/context/FinanceContext";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X, Download, Upload, Trash2, Globe } from "lucide-react";
+import { Menu, X, Download, Upload, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -17,17 +16,16 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { t } = useTranslation();
   const { exportData, importData, clearData } = useFinance();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   const navItems = [
-    { path: "/", label: t("nav.home") },
-    { path: "/financial-input", label: t("nav.financial_input") },
-    { path: "/savings-strategies", label: t("nav.savings_strategies") },
-    { path: "/charts", label: t("nav.charts") },
-    { path: "/investment", label: t("nav.investment") },
+    { path: "/", label: "Home" },
+    { path: "/financial-input", label: "Financial Input" },
+    { path: "/savings-strategies", label: "Savings Strategies" },
+    { path: "/charts", label: "Analytics" },
+    { path: "/investment", label: "Investment Advice" },
   ];
 
   const handleExport = () => {
@@ -52,11 +50,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         reader.onload = (event: any) => {
           const success = importData(event.target.result);
           if (success) {
-            // Show success toast
             const event = new CustomEvent("importSuccess");
             window.dispatchEvent(event);
           } else {
-            // Show error toast
             const event = new CustomEvent("importError");
             window.dispatchEvent(event);
           }
@@ -68,7 +64,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const handleClear = () => {
-    if (window.confirm(t("message.confirm_clear"))) {
+    if (window.confirm("This will clear all your financial data. Are you sure?")) {
       clearData();
     }
   };
@@ -89,8 +85,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <span className="text-primary-foreground font-bold text-lg">₱</span>
               </div>
               <div className="hidden sm:flex flex-col">
-                <h1 className="text-lg font-bold text-foreground">{t("app.title")}</h1>
-                <p className="text-xs text-muted-foreground">{t("app.subtitle")}</p>
+                <h1 className="text-lg font-bold text-foreground">Personal Finance Planner</h1>
+                <p className="text-xs text-muted-foreground">Plan your finances with confidence</p>
               </div>
             </Link>
 
@@ -122,15 +118,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={handleExport}>
                     <Download className="w-4 h-4 mr-2" />
-                    {t("header.export")}
+                    Export Data
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleImport}>
                     <Upload className="w-4 h-4 mr-2" />
-                    {t("header.import")}
+                    Import Data
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleClear} className="text-destructive">
                     <Trash2 className="w-4 h-4 mr-2" />
-                    {t("header.clear")}
+                    Clear Data
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -178,8 +174,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
-              <h3 className="font-semibold mb-4 text-foreground">{t("app.title")}</h3>
-              <p className="text-sm text-muted-foreground">{t("app.subtitle")}</p>
+              <h3 className="font-semibold mb-4 text-foreground">Personal Finance Planner</h3>
+              <p className="text-sm text-muted-foreground">Plan your finances with confidence</p>
             </div>
             <div>
               <h4 className="font-semibold mb-4 text-foreground">Quick Links</h4>
@@ -203,7 +199,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
           </div>
           <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} {t("app.title")}. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Personal Finance Planner. All rights reserved.</p>
           </div>
         </div>
       </footer>
