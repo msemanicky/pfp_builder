@@ -82,15 +82,15 @@ const SavingsStrategies: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-foreground mb-2">{t("savings_strategies.title")}</h1>
-        <p className="text-lg text-muted-foreground">{t("savings_strategies.subtitle")}</p>
+        <h1 className="text-4xl font-bold text-foreground mb-2">Savings Strategies</h1>
+        <p className="text-lg text-muted-foreground">Find the perfect savings strategy for your financial goals</p>
       </div>
 
       {!hasData ? (
         <div className="max-w-md mx-auto text-center">
           <Card className="bg-muted/50 border-0">
             <CardHeader>
-              <CardTitle>{t("home.no_data")}</CardTitle>
+              <CardTitle>No Data</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
@@ -115,8 +115,8 @@ const SavingsStrategies: React.FC = () => {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-lg">{t(`strategy.${strategy.id}.name`)}</CardTitle>
-                      <CardDescription className="mt-1">{t(`strategy.${strategy.id}.description`)}</CardDescription>
+                      <CardTitle className="text-lg">{strategy.name}</CardTitle>
+                      <CardDescription className="mt-1">{strategy.description}</CardDescription>
                     </div>
                     {data.selectedStrategy === strategy.id && (
                       <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
@@ -187,7 +187,7 @@ const SavingsStrategies: React.FC = () => {
                     variant={data.selectedStrategy === strategy.id ? "default" : "outline"}
                     className="w-full"
                   >
-                    {data.selectedStrategy === strategy.id ? t("savings_strategies.selected") : t("savings_strategies.select")}
+                    {data.selectedStrategy === strategy.id ? "Selected" : "Select Strategy"}
                   </Button>
                 </CardContent>
               </Card>
@@ -223,7 +223,7 @@ const SavingsStrategies: React.FC = () => {
                   <p className="text-sm text-muted-foreground mb-2">Strategy Recommendation:</p>
                   {data.selectedStrategy ? (
                     <p className="text-foreground font-medium">
-                      You've selected <span className="text-primary">{t(`strategy.${data.selectedStrategy}.name`)}</span>. This strategy suggests saving {strategies.find(s => s.id === data.selectedStrategy)?.breakdown.savings}% of your income monthly.
+                      You've selected <span className="text-primary">{strategies.find(s => s.id === data.selectedStrategy)?.name}</span>. This strategy suggests saving {strategies.find(s => s.id === data.selectedStrategy)?.breakdown.savings}% of your income monthly.
                     </p>
                   ) : (
                     <p className="text-muted-foreground">
