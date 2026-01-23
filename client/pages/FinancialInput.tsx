@@ -17,6 +17,7 @@ import { Trash2, Edit2, Plus } from "lucide-react";
 import { Income, Expense, Debt } from "@/types/finance";
 
 const FinancialInput: React.FC = () => {
+  const { t } = useTranslation();
   const { data, addIncome, updateIncome, removeIncome, addExpense, updateExpense, removeExpense, addDebt, updateDebt, removeDebt } = useFinance();
 
   // Income Form State
