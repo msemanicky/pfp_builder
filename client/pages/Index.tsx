@@ -35,8 +35,8 @@ const Index: React.FC = () => {
     <div className="container mx-auto px-4 py-12">
       {/* Hero Section */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-foreground mb-2">Financial Dashboard</h1>
-        <p className="text-lg text-muted-foreground">Welcome to your financial planner</p>
+        <h1 className="text-4xl font-bold text-foreground mb-2">{t('home.title')}</h1>
+        <p className="text-lg text-muted-foreground">{t('home.welcome')}</p>
       </div>
 
       {!hasData ? (
@@ -44,9 +44,9 @@ const Index: React.FC = () => {
         <div className="max-w-md mx-auto text-center">
           <div className="bg-muted/50 rounded-lg p-8 mb-6">
             <PieChart className="w-16 h-16 mx-auto text-muted-foreground mb-4 opacity-50" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">No financial data yet. Start by adding your income and expenses.</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-2">{t('home.no_data')}</h2>
             <p className="text-muted-foreground text-sm mb-6">
-              Get Started
+              {t('home.get_started')}
             </p>
             <Link to="/financial-input">
               <Button size="lg" className="w-full">
@@ -62,7 +62,7 @@ const Index: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
-                  Total Income
+                  {t('home.total_income')}
                   <ArrowUpRight className="w-4 h-4 text-success" />
                 </CardTitle>
               </CardHeader>
@@ -77,7 +77,7 @@ const Index: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
-                  Total Expenses
+                  {t('home.total_expenses')}
                   <ArrowDownLeft className="w-4 h-4 text-destructive" />
                 </CardTitle>
               </CardHeader>
@@ -92,7 +92,7 @@ const Index: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
-                  Available Savings
+                  {t('home.total_savings')}
                   <TrendingUp className="w-4 h-4 text-warning" />
                 </CardTitle>
               </CardHeader>
@@ -107,7 +107,7 @@ const Index: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Savings Rate
+                  {t('home.savings_rate')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -124,8 +124,8 @@ const Index: React.FC = () => {
             <Card className="cursor-pointer hover:border-primary transition-colors">
               <Link to="/financial-input">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Quick Insights</CardTitle>
-                  <CardDescription>Manage your data</CardDescription>
+                  <CardTitle className="text-base">{t('financial_input.title')}</CardTitle>
+                  <CardDescription>{t('financial_input.subtitle')}</CardDescription>
                 </CardHeader>
               </Link>
             </Card>
@@ -133,8 +133,8 @@ const Index: React.FC = () => {
             <Card className="cursor-pointer hover:border-primary transition-colors">
               <Link to="/savings-strategies">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Savings Strategies</CardTitle>
-                  <CardDescription>Choose a strategy</CardDescription>
+                  <CardTitle className="text-base">{t('savings_strategies.title')}</CardTitle>
+                  <CardDescription>{t('savings_strategies.subtitle')}</CardDescription>
                 </CardHeader>
               </Link>
             </Card>
@@ -142,8 +142,8 @@ const Index: React.FC = () => {
             <Card className="cursor-pointer hover:border-primary transition-colors">
               <Link to="/charts">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Financial Analytics</CardTitle>
-                  <CardDescription>View analytics</CardDescription>
+                  <CardTitle className="text-base">{t('charts.title')}</CardTitle>
+                  <CardDescription>{t('charts.subtitle')}</CardDescription>
                 </CardHeader>
               </Link>
             </Card>
@@ -152,7 +152,7 @@ const Index: React.FC = () => {
           {/* Summary Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Quick Insights</CardTitle>
+              <CardTitle>{t('home.quick_insights')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -160,21 +160,21 @@ const Index: React.FC = () => {
                   <p className="text-sm text-muted-foreground mb-1">Monthly Summary</p>
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-sm">Total Income</span>
+                      <span className="text-sm">{t('home.total_income')}</span>
                       <span className="font-semibold text-success">${totalMonthlyIncome.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-sm">Total Expenses</span>
+                      <span className="text-sm">{t('home.total_expenses')}</span>
                       <span className="font-semibold text-destructive">-${totalMonthlyExpenses.toFixed(2)}</span>
                     </div>
                     {totalMonthlyDebtPayment > 0 && (
                       <div className="flex justify-between">
-                        <span className="text-sm">Debt Payments</span>
+                        <span className="text-sm">{t('financial_input.monthly_payment')}</span>
                         <span className="font-semibold text-warning">-${totalMonthlyDebtPayment.toFixed(2)}</span>
                       </div>
                     )}
                     <div className="border-t border-border pt-2 flex justify-between">
-                      <span className="text-sm font-medium">Total Savings</span>
+                      <span className="text-sm font-medium">{t('home.total_savings')}</span>
                       <span className={`font-bold text-lg ${availableSavings >= 0 ? 'text-success' : 'text-destructive'}`}>
                         ${availableSavings.toFixed(2)}
                       </span>
@@ -184,10 +184,10 @@ const Index: React.FC = () => {
 
                 {data.incomes.length === 0 && (
                   <div className="pt-4 border-t border-border">
-                    <p className="text-sm text-muted-foreground mb-3">Get started by adding your first income:</p>
+                    <p className="text-sm text-muted-foreground mb-3">{t('home.get_started')}</p>
                     <Link to="/financial-input" className="w-full block">
                       <Button variant="outline" className="w-full">
-                        Add Income
+                        {t('button.add')} {t('home.total_income')}
                       </Button>
                     </Link>
                   </div>
