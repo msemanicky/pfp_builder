@@ -84,15 +84,15 @@ const SavingsStrategies: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-foreground mb-2">Savings Strategies</h1>
-        <p className="text-lg text-muted-foreground">Find the perfect savings strategy for your financial goals</p>
+        <h1 className="text-4xl font-bold text-foreground mb-2">{t('savings_strategies.title')}</h1>
+        <p className="text-lg text-muted-foreground">{t('savings_strategies.subtitle')}</p>
       </div>
 
       {!hasData ? (
         <div className="max-w-md mx-auto text-center">
           <Card className="bg-muted/50 border-0">
             <CardHeader>
-              <CardTitle>No Data</CardTitle>
+              <CardTitle>{t('home.no_data')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
@@ -189,7 +189,7 @@ const SavingsStrategies: React.FC = () => {
                     variant={data.selectedStrategy === strategy.id ? "default" : "outline"}
                     className="w-full"
                   >
-                    {data.selectedStrategy === strategy.id ? "Selected" : "Select Strategy"}
+                    {data.selectedStrategy === strategy.id ? t('savings_strategies.selected') : t('savings_strategies.select')}
                   </Button>
                 </CardContent>
               </Card>
@@ -225,7 +225,7 @@ const SavingsStrategies: React.FC = () => {
                   <p className="text-sm text-muted-foreground mb-2">Strategy Recommendation:</p>
                   {data.selectedStrategy ? (
                     <p className="text-foreground font-medium">
-                      You've selected <span className="text-primary">{strategies.find(s => s.id === data.selectedStrategy)?.name}</span>. This strategy suggests saving {strategies.find(s => s.id === data.selectedStrategy)?.breakdown.savings}% of your income monthly.
+                      {t('savings_strategies.select')} <span className="text-primary">{strategies.find(s => s.id === data.selectedStrategy)?.name}</span>. This strategy suggests saving {strategies.find(s => s.id === data.selectedStrategy)?.breakdown.savings}% of your income monthly.
                     </p>
                   ) : (
                     <p className="text-muted-foreground">
