@@ -34,6 +34,7 @@ const convertToMonthly = (amount: number, frequency: string): number => {
 const COLORS = ["#0F7173", "#F4A460", "#FFD700", "#90EE90", "#FF6B6B", "#4ECDC4", "#95E1D3"];
 
 const ChartsAnalytics: React.FC = () => {
+  const { t } = useTranslation();
   const { data } = useFinance();
 
   const totalMonthlyIncome = useMemo(() => {
