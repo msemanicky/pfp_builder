@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useFinance } from "@/context/FinanceContext";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X, Download, Upload, Trash2 } from "lucide-react";
+import { Menu, X, Download, Upload, Trash2, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
