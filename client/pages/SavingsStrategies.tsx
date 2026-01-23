@@ -73,6 +73,7 @@ const convertToMonthly = (amount: number, frequency: string): number => {
 };
 
 const SavingsStrategies: React.FC = () => {
+  const { t } = useTranslation();
   const { data, setSelectedStrategy } = useFinance();
 
   const totalMonthlyIncome = data.incomes.reduce((sum, income) => sum + convertToMonthly(income.amount, income.frequency), 0);
