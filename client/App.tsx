@@ -38,13 +38,15 @@ const App = () => {
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <FinanceProvider>
-        <Toaster />
-        <Sonner />
-        <App />
-      </FinanceProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <I18nextProvider i18n={i18n}>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <FinanceProvider>
+          <Toaster />
+          <Sonner />
+          <App />
+        </FinanceProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </I18nextProvider>
 );
