@@ -117,6 +117,29 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             {/* Action Buttons */}
             <div className="flex items-center gap-2">
+              {/* Language Selector */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" title="Change Language">
+                    <Globe className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {languages.map((lang) => (
+                    <DropdownMenuItem
+                      key={lang.code}
+                      onClick={() => i18n.changeLanguage(lang.code)}
+                      className={i18n.language === lang.code ? "bg-muted" : ""}
+                    >
+                      {lang.name}
+                      {i18n.language === lang.code && (
+                        <span className="ml-2 text-primary">✓</span>
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               {/* Data Actions */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
