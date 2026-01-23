@@ -33,6 +33,7 @@ const convertToMonthly = (amount: number, frequency: string): number => {
 };
 
 const InvestmentAdvice: React.FC = () => {
+  const { t } = useTranslation();
   const { data } = useFinance();
 
   // Get available savings
