@@ -93,27 +93,27 @@ const InvestmentAdvice: React.FC = () => {
   const principles = [
     {
       icon: <TrendingUp className="w-8 h-8" />,
-      title: "Start Early",
+      title: t('investment.principle_1'),
       description: "The younger you start investing, the more time your money has to grow through compounding.",
     },
     {
       icon: <Shield className="w-8 h-8" />,
-      title: "Diversify Your Portfolio",
+      title: t('investment.principle_2'),
       description: "Spread your investments across different asset classes to reduce risk.",
     },
     {
       icon: <Zap className="w-8 h-8" />,
-      title: "Stay Consistent",
+      title: t('investment.principle_3'),
       description: "Regular, consistent contributions are more important than timing the market.",
     },
     {
       icon: <Award className="w-8 h-8" />,
-      title: "Think Long-term",
+      title: t('investment.principle_4'),
       description: "Focus on long-term growth and don't react to short-term market volatility.",
     },
     {
       icon: <DollarSign className="w-8 h-8" />,
-      title: "Watch Your Fees",
+      title: t('investment.principle_5'),
       description: "High fees can significantly impact your returns over time.",
     },
   ];
@@ -121,13 +121,13 @@ const InvestmentAdvice: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-foreground mb-2">Investment Advice</h1>
-        <p className="text-lg text-muted-foreground">Build wealth through smart investments</p>
+        <h1 className="text-4xl font-bold text-foreground mb-2">{t('investment.title')}</h1>
+        <p className="text-lg text-muted-foreground">{t('investment.subtitle')}</p>
       </div>
 
       {/* Investment Principles */}
       <div className="mb-12">
-        <h2 className="text-2xl font-bold text-foreground mb-6">Investment Principles</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-6">{t('investment.general_principles')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {principles.map((principle, index) => (
             <Card key={index} className="hover:shadow-lg transition-shadow">
@@ -147,12 +147,12 @@ const InvestmentAdvice: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>Compound Interest Calculator</CardTitle>
+            <CardTitle>{t('investment.compound_interest')}</CardTitle>
             <CardDescription>Calculate your investment growth</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Initial Amount</Label>
+              <Label>{t('investment.initial_amount')}</Label>
               <Input
                 type="number"
                 value={calculator.initialAmount}
@@ -161,7 +161,7 @@ const InvestmentAdvice: React.FC = () => {
               />
             </div>
             <div>
-              <Label>Monthly Contribution</Label>
+              <Label>{t('investment.monthly_contribution')}</Label>
               <Input
                 type="number"
                 value={calculator.monthlyContribution}
@@ -170,7 +170,7 @@ const InvestmentAdvice: React.FC = () => {
               />
             </div>
             <div>
-              <Label>Annual Return (%)</Label>
+              <Label>{t('investment.annual_return')}</Label>
               <Input
                 type="number"
                 value={calculator.annualReturn}
@@ -180,7 +180,7 @@ const InvestmentAdvice: React.FC = () => {
               />
             </div>
             <div>
-              <Label>Years</Label>
+              <Label>{t('investment.years')}</Label>
               <Input
                 type="number"
                 value={calculator.years}
@@ -195,7 +195,7 @@ const InvestmentAdvice: React.FC = () => {
         <div className="lg:col-span-2 space-y-4">
           <Card className="bg-gradient-to-br from-success/10 to-success/5">
             <CardHeader>
-              <CardTitle className="text-lg">Projected Amount</CardTitle>
+              <CardTitle className="text-lg">{t('investment.projected_amount')}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-4xl font-bold text-success">
@@ -217,7 +217,7 @@ const InvestmentAdvice: React.FC = () => {
                 <span className="font-semibold">${finalData.principal.toLocaleString("en-US", { maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-border">
-                <span className="text-muted-foreground">Interest Earned:</span>
+                <span className="text-muted-foreground">{t('investment.interest_earned')}:</span>
                 <span className="font-semibold text-success">${finalData.interest.toLocaleString("en-US", { maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-border">
