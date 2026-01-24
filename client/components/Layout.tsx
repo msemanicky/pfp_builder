@@ -40,8 +40,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const handleExport = () => {
     const jsonData = exportData();
     const element = document.createElement("a");
-    element.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(jsonData));
-    element.setAttribute("download", `finance-data-${new Date().toISOString().split("T")[0]}.json`);
+    element.setAttribute(
+      "href",
+      "data:text/json;charset=utf-8," + encodeURIComponent(jsonData),
+    );
+    element.setAttribute(
+      "download",
+      `finance-data-${new Date().toISOString().split("T")[0]}.json`,
+    );
     element.style.display = "none";
     document.body.appendChild(element);
     element.click();
@@ -73,13 +79,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const handleClear = () => {
-    if (window.confirm("This will clear all your financial data. Are you sure?")) {
+    if (
+      window.confirm("This will clear all your financial data. Are you sure?")
+    ) {
       clearData();
     }
   };
 
   const isActive = (path: string) => {
-    return location.pathname === path ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground";
+    return location.pathname === path
+      ? "text-primary border-b-2 border-primary"
+      : "text-muted-foreground hover:text-foreground";
   };
 
   return (
@@ -89,13 +99,22 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo and Title */}
-            <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <Link
+              to="/"
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-lg">₱</span>
+                <span className="text-primary-foreground font-bold text-lg">
+                  ₱
+                </span>
               </div>
               <div className="hidden sm:flex flex-col">
-                <h1 className="text-lg font-bold text-foreground">Personal Finance Planner</h1>
-                <p className="text-xs text-muted-foreground">Plan your finances with confidence</p>
+                <h1 className="text-lg font-bold text-foreground">
+                  Personal Finance Planner
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  Plan your finances with confidence
+                </p>
               </div>
             </Link>
 
@@ -107,7 +126,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   to={item.path}
                   className={cn(
                     "px-3 py-2 text-sm font-medium transition-colors",
-                    isActive(item.path)
+                    isActive(item.path),
                   )}
                 >
                   {item.label}
@@ -156,7 +175,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <Upload className="w-4 h-4 mr-2" />
                     Import Data
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleClear} className="text-destructive">
+                  <DropdownMenuItem
+                    onClick={handleClear}
+                    className="text-destructive"
+                  >
                     <Trash2 className="w-4 h-4 mr-2" />
                     Clear Data
                   </DropdownMenuItem>
@@ -170,7 +192,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 className="md:hidden"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
-                {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+                {mobileMenuOpen ? (
+                  <X className="w-4 h-4" />
+                ) : (
+                  <Menu className="w-4 h-4" />
+                )}
               </Button>
             </div>
           </div>
@@ -185,7 +211,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   onClick={() => setMobileMenuOpen(false)}
                   className={cn(
                     "px-3 py-2 text-sm font-medium transition-colors rounded-md",
-                    isActive(item.path)
+                    isActive(item.path),
                   )}
                 >
                   {item.label}
@@ -197,24 +223,31 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
 
       {/* Footer */}
       <footer className="border-t border-border bg-muted/50 py-8 mt-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
-              <h3 className="font-semibold mb-4 text-foreground">{t('app.title')}</h3>
-              <p className="text-sm text-muted-foreground">{t('app.subtitle')}</p>
+              <h3 className="font-semibold mb-4 text-foreground">
+                {t("app.title")}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t("app.subtitle")}
+              </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-foreground">Quick Links</h4>
+              <h4 className="font-semibold mb-4 text-foreground">
+                Quick Links
+              </h4>
               <ul className="space-y-2 text-sm">
                 {navItems.map((item) => (
                   <li key={item.path}>
-                    <Link to={item.path} className="text-muted-foreground hover:text-foreground transition-colors">
+                    <Link
+                      to={item.path}
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
                       {item.label}
                     </Link>
                   </li>
@@ -224,14 +257,38 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div>
               <h4 className="font-semibold mb-4 text-foreground">Resources</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Contact Us</a></li>
+                <li>
+                  <a
+                    href="#"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Terms of Service
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Contact Us
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
           <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} Personal Finance Planner. All rights reserved.</p>
+            <p>
+              &copy; {new Date().getFullYear()} Personal Finance Planner. All
+              rights reserved.
+            </p>
           </div>
         </div>
       </footer>
