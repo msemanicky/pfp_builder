@@ -18,7 +18,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { exportData, importData, clearData } = useFinance();
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -30,11 +30,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   ];
 
   const navItems = [
-    { path: "/", label: "Home" },
-    { path: "/financial-input", label: "Financial Input" },
-    { path: "/savings-strategies", label: "Savings Strategies" },
-    { path: "/charts", label: "Analytics" },
-    { path: "/investment", label: "Investment Advice" },
+    { path: "/", label: t("nav.home") },
+    { path: "/financial-input", label: t("nav.financial_input") },
+    { path: "/savings-strategies", label: t("nav.savings_strategies") },
+    { path: "/charts", label: t("nav.charts") },
+    { path: "/investment", label: t("nav.investment") },
   ];
 
   const handleExport = () => {
