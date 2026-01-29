@@ -27,6 +27,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     { code: "es", name: "Español" },
     { code: "fr", name: "Français" },
     { code: "de", name: "Deutsch" },
+    { code: "sk", name: "Slovenčina" },
   ];
 
   const navItems = [

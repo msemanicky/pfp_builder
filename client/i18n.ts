@@ -4,12 +4,14 @@ import enTranslations from "./locales/en.json";
 import esTranslations from "./locales/es.json";
 import frTranslations from "./locales/fr.json";
 import deTranslations from "./locales/de.json";
+import skTranslations from "./locales/sk.json";
 
 const resources = {
   en: { translation: enTranslations },
   es: { translation: esTranslations },
   fr: { translation: frTranslations },
   de: { translation: deTranslations },
+  sk: { translation: skTranslations },
 };
 
 i18n.use(initReactI18next).init({
