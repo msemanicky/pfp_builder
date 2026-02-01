@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useFinance } from "@/context/FinanceContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { CheckCircle2 } from "lucide-react";
 import { SavingsStrategy } from "@/types/finance";
 
@@ -74,7 +76,9 @@ const convertToMonthly = (amount: number, frequency: string): number => {
 
 const SavingsStrategies: React.FC = () => {
   const { t } = useTranslation();
-  const { data, setSelectedStrategy } = useFinance();
+  const { data, setSelectedStrategy, setCustomStrategy } = useFinance();
+  
+  const [customBreakdown, setCustomBreakdown] = useState(data.customStrategy);
 
   const totalMonthlyIncome = data.incomes.reduce((sum, income) => sum + convertToMonthly(income.amount, income.frequency), 0);
   const totalMonthlyExpenses = data.expenses.reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
@@ -194,6 +198,145 @@ const SavingsStrategies: React.FC = () => {
                 </CardContent>
               </Card>
             ))}
+            
+            {/* Custom Strategy Card */}
+            <Card
+              className={`transition-all hover:shadow-lg ${
+                data.selectedStrategy === "custom"
+                  ? "ring-2 ring-primary border-primary"
+                  : "hover:border-primary"
+              }`}
+            >
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg">Custom Strategy</CardTitle>
+                    <CardDescription className="mt-1">Create your own allocation</CardDescription>
+                  </div>
+                  {data.selectedStrategy === "custom" && (
+                    <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Custom Input Fields */}
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs">Needs (%)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={customBreakdown.needs}
+                      onChange={(e) => {
+                        const needs = parseInt(e.target.value) || 0;
+                        setCustomBreakdown({ ...customBreakdown, needs });
+                      }}
+                      className="h-8"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Wants (%)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={customBreakdown.wants}
+                      onChange={(e) => {
+                        const wants = parseInt(e.target.value) || 0;
+                        setCustomBreakdown({ ...customBreakdown, wants });
+                      }}
+                      className="h-8"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Savings (%)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={customBreakdown.savings}
+                      onChange={(e) => {
+                        const savings = parseInt(e.target.value) || 0;
+                        setCustomBreakdown({ ...customBreakdown, savings });
+                      }}
+                      className="h-8"
+                    />
+                  </div>
+                  
+                  {/* Total Validation */}
+                  <div className="text-xs">
+                    <span className={`font-medium ${
+                      customBreakdown.needs + customBreakdown.wants + customBreakdown.savings === 100
+                        ? "text-success"
+                        : "text-destructive"
+                    }`}>
+                      Total: {customBreakdown.needs + customBreakdown.wants + customBreakdown.savings}%
+                    </span>
+                    {customBreakdown.needs + customBreakdown.wants + customBreakdown.savings !== 100 && (
+                      <span className="text-muted-foreground ml-2">(must equal 100%)</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Breakdown Visualization */}
+                <div className="space-y-2">
+                  <div className="flex gap-2 h-8 rounded-lg overflow-hidden bg-muted">
+                    <div
+                      className="bg-primary flex items-center justify-center text-xs font-semibold text-primary-foreground"
+                      style={{ width: `${customBreakdown.needs}%` }}
+                    >
+                      {customBreakdown.needs > 15 && `${customBreakdown.needs}%`}
+                    </div>
+                    <div
+                      className="bg-warning flex items-center justify-center text-xs font-semibold text-warning-foreground"
+                      style={{ width: `${customBreakdown.wants}%` }}
+                    >
+                      {customBreakdown.wants > 15 && `${customBreakdown.wants}%`}
+                    </div>
+                    <div
+                      className="bg-success flex items-center justify-center text-xs font-semibold text-success-foreground"
+                      style={{ width: `${customBreakdown.savings}%` }}
+                    >
+                      {customBreakdown.savings > 15 && `${customBreakdown.savings}%`}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dollar Amounts */}
+                {totalMonthlyIncome > 0 && (
+                  <div className="bg-muted/50 rounded-lg p-3 space-y-2 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Needs ({customBreakdown.needs}%):</span>
+                      <span className="font-semibold">${((totalMonthlyIncome * customBreakdown.needs) / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Wants ({customBreakdown.wants}%):</span>
+                      <span className="font-semibold">${((totalMonthlyIncome * customBreakdown.wants) / 100).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between border-t border-border pt-2">
+                      <span className="text-muted-foreground font-medium">Savings ({customBreakdown.savings}%):</span>
+                      <span className="font-bold text-success">${((totalMonthlyIncome * customBreakdown.savings) / 100).toFixed(2)}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Apply Button */}
+                <Button
+                  onClick={() => {
+                    if (customBreakdown.needs + customBreakdown.wants + customBreakdown.savings === 100) {
+                      setCustomStrategy(customBreakdown);
+                      setSelectedStrategy("custom");
+                    }
+                  }}
+                  variant={data.selectedStrategy === "custom" ? "default" : "outline"}
+                  className="w-full"
+                  disabled={customBreakdown.needs + customBreakdown.wants + customBreakdown.savings !== 100}
+                >
+                  {data.selectedStrategy === "custom" ? "Selected" : "Apply Custom Strategy"}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Current Situation Analysis */}

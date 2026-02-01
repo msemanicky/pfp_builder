@@ -38,6 +38,11 @@ export interface FinanceData {
   expenses: Expense[];
   debts: Debt[];
   selectedStrategy: string | null;
+  customStrategy: {
+    needs: number;
+    wants: number;
+    savings: number;
+  };
   language: "en" | "es" | "fr" | "de";
 }
 

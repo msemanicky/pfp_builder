@@ -22,6 +22,7 @@ interface FinanceContextType {
   
   // Strategy operations
   setSelectedStrategy: (strategyId: string | null) => void;
+  setCustomStrategy: (breakdown: { needs: number; wants: number; savings: number }) => void;
   
   // Data persistence
   exportData: () => string;
@@ -38,6 +39,11 @@ const defaultData: FinanceData = {
   expenses: [],
   debts: [],
   selectedStrategy: null,
+  customStrategy: {
+    needs: 50,
+    wants: 30,
+    savings: 20,
+  },
   language: "en",
 };
 
@@ -141,6 +147,10 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setData((prev) => ({ ...prev, selectedStrategy: strategyId }));
   };
 
+  const setCustomStrategy = (breakdown: { needs: number; wants: number; savings: number }) => {
+    setData((prev) => ({ ...prev, customStrategy: breakdown }));
+  };
+
   const exportData = (): string => {
     return JSON.stringify(data, null, 2);
   };
@@ -183,6 +193,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     updateDebt,
     removeDebt,
     setSelectedStrategy,
+    setCustomStrategy,
     exportData,
     importData,
     clearData,
