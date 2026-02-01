@@ -21,15 +21,17 @@ const FinancialInput: React.FC = () => {
   const { data, addIncome, updateIncome, removeIncome, addExpense, updateExpense, removeExpense, addDebt, updateDebt, removeDebt } = useFinance();
 
   // Income Form State
-  const [incomeForm, setIncomeForm] = useState({ name: "", amount: 0, frequency: "monthly" });
+  const [incomeForm, setIncomeForm] = useState<{ name: string; amount: string | number; frequency: string }>({ name: "", amount: "", frequency: "monthly" });
   const [editingIncomeId, setEditingIncomeId] = useState<string | null>(null);
 
   // Expense Form State
-  const [expenseForm, setExpenseForm] = useState({ name: "", amount: 0, category: "other", frequency: "monthly" });
+  const [expenseForm, setExpenseForm] = useState<{ name: string; amount: string | number; category: string; frequency: string }>({ name: "", amount: "", category: "other", frequency: "monthly" });
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
 
   // Debt Form State
-  const [debtForm, setDebtForm] = useState({ name: "", principal: 0, interestRate: 0, monthlyPayment: 0, remainingMonths: 0 });
+  const [debtForm, setDebtForm] = useState<{ name: string; principal: string | number; interestRate: string | number; monthlyPayment: string | number; remainingMonths: string | number }>({
+    name: "", principal: "", interestRate: "", monthlyPayment: "", remainingMonths: ""
+  });
   const [editingDebtId, setEditingDebtId] = useState<string | null>(null);
 
   const frequency_options = ["monthly", "annual", "weekly", "biweekly"];
@@ -37,22 +39,23 @@ const FinancialInput: React.FC = () => {
 
   // Income Handlers
   const handleAddIncome = () => {
-    if (!incomeForm.name || incomeForm.amount <= 0) return;
+    const amount = typeof incomeForm.amount === 'string' ? parseFloat(incomeForm.amount) : incomeForm.amount;
+    if (!incomeForm.name || !amount || amount <= 0) return;
     if (editingIncomeId) {
       updateIncome(editingIncomeId, {
         name: incomeForm.name,
-        amount: incomeForm.amount,
+        amount: amount,
         frequency: incomeForm.frequency as any,
       });
       setEditingIncomeId(null);
     } else {
       addIncome({
         name: incomeForm.name,
-        amount: incomeForm.amount,
+        amount: amount,
         frequency: incomeForm.frequency as any,
       });
     }
-    setIncomeForm({ name: "", amount: 0, frequency: "monthly" });
+    setIncomeForm({ name: "", amount: "", frequency: "monthly" });
   };
 
   const handleEditIncome = (income: Income) => {
@@ -66,11 +69,12 @@ const FinancialInput: React.FC = () => {
 
   // Expense Handlers
   const handleAddExpense = () => {
-    if (!expenseForm.name || expenseForm.amount <= 0) return;
+    const amount = typeof expenseForm.amount === 'string' ? parseFloat(expenseForm.amount) : expenseForm.amount;
+    if (!expenseForm.name || !amount || amount <= 0) return;
     if (editingExpenseId) {
       updateExpense(editingExpenseId, {
         name: expenseForm.name,
-        amount: expenseForm.amount,
+        amount: amount,
         category: expenseForm.category as any,
         frequency: expenseForm.frequency as any,
       });
@@ -78,12 +82,12 @@ const FinancialInput: React.FC = () => {
     } else {
       addExpense({
         name: expenseForm.name,
-        amount: expenseForm.amount,
+        amount: amount,
         category: expenseForm.category as any,
         frequency: expenseForm.frequency as any,
       });
     }
-    setExpenseForm({ name: "", amount: 0, category: "other", frequency: "monthly" });
+    setExpenseForm({ name: "", amount: "", category: "other", frequency: "monthly" });
   };
 
   const handleEditExpense = (expense: Expense) => {
@@ -98,26 +102,31 @@ const FinancialInput: React.FC = () => {
 
   // Debt Handlers
   const handleAddDebt = () => {
-    if (!debtForm.name || debtForm.principal <= 0) return;
+    const principal = typeof debtForm.principal === 'string' ? parseFloat(debtForm.principal) : debtForm.principal;
+    const interestRate = typeof debtForm.interestRate === 'string' ? parseFloat(debtForm.interestRate) : debtForm.interestRate;
+    const monthlyPayment = typeof debtForm.monthlyPayment === 'string' ? parseFloat(debtForm.monthlyPayment) : debtForm.monthlyPayment;
+    const remainingMonths = typeof debtForm.remainingMonths === 'string' ? parseInt(debtForm.remainingMonths) : debtForm.remainingMonths;
+
+    if (!debtForm.name || !principal || principal <= 0) return;
     if (editingDebtId) {
       updateDebt(editingDebtId, {
         name: debtForm.name,
-        principal: debtForm.principal,
-        interestRate: debtForm.interestRate,
-        monthlyPayment: debtForm.monthlyPayment,
-        remainingMonths: debtForm.remainingMonths,
+        principal: principal,
+        interestRate: interestRate || 0,
+        monthlyPayment: monthlyPayment || 0,
+        remainingMonths: remainingMonths || 0,
       });
       setEditingDebtId(null);
     } else {
       addDebt({
         name: debtForm.name,
-        principal: debtForm.principal,
-        interestRate: debtForm.interestRate,
-        monthlyPayment: debtForm.monthlyPayment,
-        remainingMonths: debtForm.remainingMonths,
+        principal: principal,
+        interestRate: interestRate || 0,
+        monthlyPayment: monthlyPayment || 0,
+        remainingMonths: remainingMonths || 0,
       });
     }
-    setDebtForm({ name: "", principal: 0, interestRate: 0, monthlyPayment: 0, remainingMonths: 0 });
+    setDebtForm({ name: "", principal: "", interestRate: "", monthlyPayment: "", remainingMonths: "" });
   };
 
   const handleEditDebt = (debt: Debt) => {
@@ -166,8 +175,9 @@ const FinancialInput: React.FC = () => {
                   <Input
                     type="number"
                     value={incomeForm.amount}
-                    onChange={(e) => setIncomeForm({ ...incomeForm, amount: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) => setIncomeForm({ ...incomeForm, amount: e.target.value })}
                     placeholder="0.00"
+                    onFocus={(e) => e.target.select()}
                   />
                 </div>
                 <div>
@@ -268,8 +278,9 @@ const FinancialInput: React.FC = () => {
                   <Input
                     type="number"
                     value={expenseForm.amount}
-                    onChange={(e) => setExpenseForm({ ...expenseForm, amount: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })}
                     placeholder="0.00"
+                    onFocus={(e) => e.target.select()}
                   />
                 </div>
                 <div>
@@ -385,8 +396,9 @@ const FinancialInput: React.FC = () => {
                   <Input
                     type="number"
                     value={debtForm.principal}
-                    onChange={(e) => setDebtForm({ ...debtForm, principal: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) => setDebtForm({ ...debtForm, principal: e.target.value })}
                     placeholder="0.00"
+                    onFocus={(e) => e.target.select()}
                   />
                 </div>
                 <div>
@@ -394,9 +406,10 @@ const FinancialInput: React.FC = () => {
                   <Input
                     type="number"
                     value={debtForm.interestRate}
-                    onChange={(e) => setDebtForm({ ...debtForm, interestRate: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) => setDebtForm({ ...debtForm, interestRate: e.target.value })}
                     placeholder="0.00"
                     step="0.01"
+                    onFocus={(e) => e.target.select()}
                   />
                 </div>
                 <div>
@@ -404,8 +417,9 @@ const FinancialInput: React.FC = () => {
                   <Input
                     type="number"
                     value={debtForm.monthlyPayment}
-                    onChange={(e) => setDebtForm({ ...debtForm, monthlyPayment: parseFloat(e.target.value) || 0 })}
+                    onChange={(e) => setDebtForm({ ...debtForm, monthlyPayment: e.target.value })}
                     placeholder="0.00"
+                    onFocus={(e) => e.target.select()}
                   />
                 </div>
                 <div>
@@ -413,8 +427,9 @@ const FinancialInput: React.FC = () => {
                   <Input
                     type="number"
                     value={debtForm.remainingMonths}
-                    onChange={(e) => setDebtForm({ ...debtForm, remainingMonths: parseInt(e.target.value) || 0 })}
+                    onChange={(e) => setDebtForm({ ...debtForm, remainingMonths: e.target.value })}
                     placeholder="0"
+                    onFocus={(e) => e.target.select()}
                   />
                 </div>
                 <div className="flex gap-2 pt-2">

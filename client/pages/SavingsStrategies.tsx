@@ -361,10 +361,11 @@ const SavingsStrategies: React.FC = () => {
                       max="100"
                       value={customBreakdown.needs}
                       onChange={(e) => {
-                        const needs = parseInt(e.target.value) || 0;
-                        adjustBreakdown('needs', needs);
+                        const needs = parseInt(e.target.value);
+                        adjustBreakdown('needs', isNaN(needs) ? 0 : needs);
                       }}
                       className="h-8"
+                      onFocus={(e) => e.target.select()}
                     />
                   </div>
                   <div>
@@ -375,10 +376,11 @@ const SavingsStrategies: React.FC = () => {
                       max="100"
                       value={customBreakdown.wants}
                       onChange={(e) => {
-                        const wants = parseInt(e.target.value) || 0;
-                        adjustBreakdown('wants', wants);
+                        const wants = parseInt(e.target.value);
+                        adjustBreakdown('wants', isNaN(wants) ? 0 : wants);
                       }}
                       className="h-8"
+                      onFocus={(e) => e.target.select()}
                     />
                   </div>
                   <div>
@@ -389,10 +391,11 @@ const SavingsStrategies: React.FC = () => {
                       max="100"
                       value={customBreakdown.savings}
                       onChange={(e) => {
-                        const savings = parseInt(e.target.value) || 0;
-                        adjustBreakdown('savings', savings);
+                        const savings = parseInt(e.target.value);
+                        adjustBreakdown('savings', isNaN(savings) ? 0 : savings);
                       }}
                       className="h-8"
+                      onFocus={(e) => e.target.select()}
                     />
                   </div>
 
