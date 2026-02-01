@@ -19,6 +19,14 @@ import {
 } from "recharts";
 import { TrendingUp, Award, Zap, Shield, DollarSign } from "lucide-react";
 
+const STRATEGY_SAVINGS_PERCENT: Record<string, number> = {
+  "50_30_20": 20,
+  pay_yourself_first: 20,
+  aggressive_saving: 40,
+  balanced: 30,
+  debt_payoff: 10,
+};
+
 const convertToMonthly = (amount: number, frequency: string): number => {
   switch (frequency) {
     case "annual":
@@ -41,12 +49,21 @@ const InvestmentAdvice: React.FC = () => {
   const totalMonthlyExpenses = data.expenses.reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
   const totalMonthlyDebtPayment = data.debts.reduce((sum, debt) => sum + debt.monthlyPayment, 0);
   const monthlyAvailableSavings = totalMonthlyIncome - totalMonthlyExpenses - totalMonthlyDebtPayment;
+  const selectedSavingsPercent = data.selectedStrategy === "custom"
+    ? data.customStrategy.savings
+    : data.selectedStrategy
+    ? STRATEGY_SAVINGS_PERCENT[data.selectedStrategy]
+    : undefined;
+  const strategyMonthlySavings = selectedSavingsPercent !== undefined
+    ? (totalMonthlyIncome * selectedSavingsPercent) / 100
+    : monthlyAvailableSavings;
 
   // Compound Interest Calculator State
   const [calculator, setCalculator] = useState({
     initialAmount: 0,
-    monthlyContribution: Math.max(0, monthlyAvailableSavings),
+    monthlyContribution: Math.max(0, strategyMonthlySavings),
     annualReturn: 7,
+    inflationRate: 2.5,
     years: 10,
   });
 
@@ -57,8 +74,10 @@ const InvestmentAdvice: React.FC = () => {
       total: number;
       principal: number;
       interest: number;
+      realValue: number;
     }> = [];
     const monthlyRate = calculator.annualReturn / 100 / 12;
+    const monthlyInflation = calculator.inflationRate / 100 / 12;
     let total = calculator.initialAmount;
 
     for (let month = 0; month <= calculator.years * 12; month++) {
@@ -68,12 +87,16 @@ const InvestmentAdvice: React.FC = () => {
       if (month % 12 === 0 || month === calculator.years * 12) {
         const principalInvested = calculator.initialAmount + calculator.monthlyContribution * month;
         const interest = Math.max(0, total - principalInvested);
+        // Calculate real value (adjusted for inflation)
+        const inflationFactor = Math.pow(1 + calculator.inflationRate / 100, year);
+        const realValue = total / inflationFactor;
         
         data.push({
           year,
           total: Math.round(total * 100) / 100,
           principal: Math.round(principalInvested * 100) / 100,
           interest: Math.round(interest * 100) / 100,
+          realValue: Math.round(realValue * 100) / 100,
         });
       }
 
@@ -82,7 +105,7 @@ const InvestmentAdvice: React.FC = () => {
     }
 
     return data;
-  }, [calculator.initialAmount, calculator.monthlyContribution, calculator.annualReturn, calculator.years]);
+  }, [calculator.initialAmount, calculator.monthlyContribution, calculator.annualReturn, calculator.inflationRate, calculator.years]);
 
   const finalData = compoundInterestData[compoundInterestData.length - 1] || {
     total: 0,
@@ -180,6 +203,16 @@ const InvestmentAdvice: React.FC = () => {
               />
             </div>
             <div>
+              <Label>Inflation Rate (%)</Label>
+              <Input
+                type="number"
+                value={calculator.inflationRate}
+                onChange={(e) => setCalculator({ ...calculator, inflationRate: parseFloat(e.target.value) || 0 })}
+                placeholder="2.5"
+                step="0.1"
+              />
+            </div>
+            <div>
               <Label>{t('investment.years')}</Label>
               <Input
                 type="number"
@@ -202,8 +235,18 @@ const InvestmentAdvice: React.FC = () => {
                 ${finalData.total.toLocaleString("en-US", { maximumFractionDigits: 2 })}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                After {calculator.years} year{calculator.years !== 1 ? "s" : ""}
+                After {calculator.years} year{calculator.years !== 1 ? "s" : ""} (Nominal)
               </p>
+              {calculator.inflationRate > 0 && (
+                <>
+                  <p className="text-2xl font-semibold text-success/80 mt-4">
+                    ${finalData.realValue.toLocaleString("en-US", { maximumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Real value (adjusted for {calculator.inflationRate}% inflation)
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
 
