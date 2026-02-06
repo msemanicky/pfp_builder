@@ -146,171 +146,11 @@ const ChartsAnalytics: React.FC = () => {
     };
   });
 
-  // Debt calculation helpers
-  const calculateAmortization = (principal: number, rate: number, payment: number) => {
-    const schedule: Array<{ month: number; principal: number; interest: number; balance: number }> = [];
-    let balance = principal;
-    let month = 0;
-    const monthlyRate = rate / 100 / 12;
-
-    while (balance > 0 && month < 600) { // Max 50 years to prevent infinite loops
-      month++;
-      const interest = balance * monthlyRate;
-      const principalPayment = Math.min(payment - interest, balance);
-      balance -= principalPayment;
-
-      if (balance < 0.01) balance = 0; // Handle floating point
-
-      schedule.push({
-        month,
-        principal: principalPayment,
-        interest,
-        balance: Math.round(balance * 100) / 100,
-      });
-
-      if (principalPayment <= 0) break; // Payment too small
-    }
-
-    return schedule;
-  };
-
-  // 1. Payoff Progression Chart - Total debt over time
-  const debtProgressionData = (() => {
-    const maxMonths = Math.max(...data.debts.map(d => d.remainingMonths), 1);
-    const progression: Array<{ month: string; totalDebt: number; [key: string]: any }> = [];
-
-    for (let month = 0; month <= maxMonths; month++) {
-      const dataPoint: { month: string; totalDebt: number; [key: string]: any } = {
-        month: month === 0 ? t('debt_analytics.now') : `M${month}`,
-        totalDebt: 0,
-      };
-
-      data.debts.forEach(debt => {
-        const schedule = calculateAmortization(debt.principal, debt.interestRate, debt.monthlyPayment);
-        const balance = month < schedule.length ? schedule[month].balance : 0;
-        dataPoint.totalDebt += balance;
-        dataPoint[debt.name] = balance;
-      });
-
-      progression.push(dataPoint);
-    }
-
-    return progression;
-  })();
-
-  // 2. Interest vs Principal breakdown
-  const interestVsPrincipalData = data.debts.map(debt => {
-    const schedule = calculateAmortization(debt.principal, debt.interestRate, debt.monthlyPayment);
-    const totalInterest = schedule.reduce((sum, month) => sum + month.interest, 0);
-    const totalPrincipal = schedule.reduce((sum, month) => sum + month.principal, 0);
-
-    return {
-      name: debt.name,
-      principal: Math.round(totalPrincipal * 100) / 100,
-      interest: Math.round(totalInterest * 100) / 100,
-      totalCost: Math.round((totalPrincipal + totalInterest) * 100) / 100,
-    };
-  });
-
-  // 3. Strategy Comparison - Avalanche vs Snowball
-  const strategyComparisonData = (() => {
-    if (data.debts.length === 0) return [];
-
-    const totalMinPayment = data.debts.reduce((sum, d) => sum + d.monthlyPayment, 0);
-
-    // Avalanche: Highest interest rate first
-    const avalancheDebts = [...data.debts].sort((a, b) => b.interestRate - a.interestRate);
-    let avalancheMonths = 0;
-    let avalancheTotalInterest = 0;
-    let remainingDebts = avalancheDebts.map(d => ({ ...d, balance: d.principal }));
-
-    while (remainingDebts.length > 0 && avalancheMonths < 600) {
-      avalancheMonths++;
-      let availablePayment = totalMinPayment;
-
-      remainingDebts = remainingDebts.filter(debt => {
-        const monthlyRate = debt.interestRate / 100 / 12;
-        const interest = debt.balance * monthlyRate;
-        avalancheTotalInterest += interest;
-
-        const payment = Math.min(availablePayment, debt.monthlyPayment + (availablePayment - totalMinPayment));
-        const principal = Math.min(payment - interest, debt.balance);
-        debt.balance -= principal;
-        availablePayment -= payment;
-
-        return debt.balance > 0.01;
-      });
-    }
-
-    // Snowball: Lowest balance first
-    const snowballDebts = [...data.debts].sort((a, b) => a.principal - b.principal);
-    let snowballMonths = 0;
-    let snowballTotalInterest = 0;
-    remainingDebts = snowballDebts.map(d => ({ ...d, balance: d.principal }));
-
-    while (remainingDebts.length > 0 && snowballMonths < 600) {
-      snowballMonths++;
-      let availablePayment = totalMinPayment;
-
-      remainingDebts = remainingDebts.filter(debt => {
-        const monthlyRate = debt.interestRate / 100 / 12;
-        const interest = debt.balance * monthlyRate;
-        snowballTotalInterest += interest;
-
-        const payment = Math.min(availablePayment, debt.monthlyPayment + (availablePayment - totalMinPayment));
-        const principal = Math.min(payment - interest, debt.balance);
-        debt.balance -= principal;
-        availablePayment -= payment;
-
-        return debt.balance > 0.01;
-      });
-    }
-
-    return [
-      {
-        strategy: t('debt_analytics.avalanche'),
-        months: avalancheMonths,
-        totalInterest: Math.round(avalancheTotalInterest * 100) / 100,
-      },
-      {
-        strategy: t('debt_analytics.snowball'),
-        months: snowballMonths,
-        totalInterest: Math.round(snowballTotalInterest * 100) / 100,
-      },
-    ];
-  })();
-
-  // 4. Impact of Extra Payments
-  const extraPaymentImpact = (() => {
-    if (data.debts.length === 0) return [];
-
-    const scenarios = [0, 50, 100, 200, 500];
-
-    return scenarios.map(extraPayment => {
-      let totalMonths = 0;
-      let totalInterest = 0;
-
-      data.debts.forEach(debt => {
-        const newPayment = debt.monthlyPayment + (extraPayment / data.debts.length);
-        const schedule = calculateAmortization(debt.principal, debt.interestRate, newPayment);
-        totalMonths = Math.max(totalMonths, schedule.length);
-        totalInterest += schedule.reduce((sum, m) => sum + m.interest, 0);
-      });
-
-      return {
-        extra: `+$${extraPayment}`,
-        months: totalMonths,
-        totalInterest: Math.round(totalInterest * 100) / 100,
-        monthlySavings: extraPayment,
-      };
-    });
-  })();
-
-  // 5. Total Cost Visualization (current data showing total amounts)
-  const totalCostData = data.debts.map(debt => ({
+  // Debt payoff timeline
+  const debtPayoffData = data.debts.map((debt) => ({
     name: debt.name,
-    principal: debt.principal,
-    interestRate: debt.interestRate,
+    remaining: debt.remainingMonths,
+    payment: debt.monthlyPayment,
   }));
 
   // Expense breakdown by category
@@ -452,163 +292,28 @@ const ChartsAnalytics: React.FC = () => {
         </Card>
       </div>
 
-      {data.debts.length > 0 && (
-        <>
-          {/* Debt Analytics Section Header */}
-          <div className="mt-12 mb-6">
-            <h2 className="text-3xl font-bold text-foreground mb-2">{t('debt_analytics.title')}</h2>
-            <p className="text-muted-foreground">{t('debt_analytics.subtitle')}</p>
-          </div>
-
-          {/* 1. Debt Payoff Progression Over Time */}
-          <Card className="mb-8">
+      {debtPayoffData.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Debt Payoff Timeline */}
+          <Card>
             <CardHeader>
-              <CardTitle>{t('debt_analytics.progression_title')}</CardTitle>
-              <CardDescription>{t('debt_analytics.progression_desc')}</CardDescription>
+              <CardTitle>{t('charts.debt_payoff')}</CardTitle>
+              <CardDescription>Months remaining for each debt</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={debtProgressionData}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={debtPayoffData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" />
+                  <XAxis dataKey="name" />
                   <YAxis />
-                  <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
+                  <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="totalDebt" stroke="#FF6B6B" strokeWidth={3} name={t('debt_analytics.total_debt')} />
-                  {data.debts.map((debt, idx) => (
-                    <Line
-                      key={debt.id}
-                      type="monotone"
-                      dataKey={debt.name}
-                      stroke={COLORS[idx % COLORS.length]}
-                      strokeWidth={2}
-                      strokeDasharray="3 3"
-                    />
-                  ))}
-                </LineChart>
+                  <Bar dataKey="remaining" fill="#FFD700" name="Months Remaining" />
+                </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* 2. Interest vs Principal Breakdown */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('debt_analytics.interest_vs_principal_title')}</CardTitle>
-                <CardDescription>{t('debt_analytics.interest_vs_principal_desc')}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={interestVsPrincipalData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
-                    <Legend />
-                    <Bar dataKey="principal" stackId="a" fill="#0F7173" name={t('debt_analytics.principal')} />
-                    <Bar dataKey="interest" stackId="a" fill="#FF6B6B" name={t('debt_analytics.interest_paid')} />
-                  </BarChart>
-                </ResponsiveContainer>
-                <div className="mt-4 text-sm text-muted-foreground">
-                  <p className="font-semibold">{t('debt_analytics.total_interest')}: ${interestVsPrincipalData.reduce((sum, d) => sum + d.interest, 0).toFixed(2)}</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* 3. Strategy Comparison */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('debt_analytics.strategy_comparison_title')}</CardTitle>
-                <CardDescription>{t('debt_analytics.strategy_comparison_desc')}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={strategyComparisonData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="strategy" />
-                    <YAxis yAxisId="left" orientation="left" />
-                    <YAxis yAxisId="right" orientation="right" />
-                    <Tooltip />
-                    <Legend />
-                    <Bar yAxisId="left" dataKey="months" fill="#4ECDC4" name={t('debt_analytics.months_to_payoff')} />
-                    <Bar yAxisId="right" dataKey="totalInterest" fill="#FFD700" name={t('debt_analytics.total_interest_dollars')} />
-                  </BarChart>
-                </ResponsiveContainer>
-                {strategyComparisonData.length === 2 && (
-                  <div className="mt-4 text-sm">
-                    <p className="text-muted-foreground">
-                      <span className="font-semibold text-foreground">{t('debt_analytics.savings_with_best')}:</span> {' '}
-                      ${Math.abs(strategyComparisonData[0].totalInterest - strategyComparisonData[1].totalInterest).toFixed(2)} {t('debt_analytics.in_interest')}, {' '}
-                      {Math.abs(strategyComparisonData[0].months - strategyComparisonData[1].months)} {t('debt_analytics.months_faster')}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* 4. Impact of Extra Payments */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('debt_analytics.extra_payments_title')}</CardTitle>
-                <CardDescription>{t('debt_analytics.extra_payments_desc')}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={extraPaymentImpact}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="extra" />
-                    <YAxis yAxisId="left" orientation="left" />
-                    <YAxis yAxisId="right" orientation="right" />
-                    <Tooltip />
-                    <Legend />
-                    <Line yAxisId="left" type="monotone" dataKey="months" stroke="#0F7173" strokeWidth={2} name={t('debt_analytics.months_to_payoff')} />
-                    <Line yAxisId="right" type="monotone" dataKey="totalInterest" stroke="#FF6B6B" strokeWidth={2} name={t('debt_analytics.total_interest_dollars')} />
-                  </LineChart>
-                </ResponsiveContainer>
-                {extraPaymentImpact.length > 1 && (
-                  <div className="mt-4 text-sm text-muted-foreground">
-                    <p>
-                      <span className="font-semibold text-foreground">{t('debt_analytics.with_extra')}:</span> {t('debt_analytics.save')} ${(extraPaymentImpact[0].totalInterest - extraPaymentImpact[2].totalInterest).toFixed(2)} {t('debt_analytics.in_interest')},
-                      {' '}{t('debt_analytics.finish')} {extraPaymentImpact[0].months - extraPaymentImpact[2].months} {t('debt_analytics.months_earlier')}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* 5. Total Cost Visualization */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('debt_analytics.total_cost_title')}</CardTitle>
-                <CardDescription>{t('debt_analytics.total_cost_desc')}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={totalCostData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="name" />
-                    <YAxis yAxisId="left" orientation="left" label={{ value: t('debt_analytics.principal_label'), angle: -90, position: 'insideLeft' }} />
-                    <YAxis yAxisId="right" orientation="right" label={{ value: t('debt_analytics.interest_rate_label'), angle: 90, position: 'insideRight' }} />
-                    <Tooltip />
-                    <Legend />
-                    <Bar yAxisId="left" dataKey="principal" fill="#0F7173" name={t('debt_analytics.principal_balance')} />
-                    <Bar yAxisId="right" dataKey="interestRate" fill="#F4A460" name={t('debt_analytics.interest_rate_percent')} />
-                  </BarChart>
-                </ResponsiveContainer>
-                <div className="mt-4 space-y-2">
-                  {totalCostData.map((debt, idx) => (
-                    <div key={idx} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{debt.name}:</span>
-                      <span className="font-semibold">${debt.principal.toFixed(2)} @ {debt.interestRate}%</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </>
+        </div>
       )}
 
       {expenseByCategory.length > 0 && (
