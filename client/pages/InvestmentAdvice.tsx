@@ -117,27 +117,27 @@ const InvestmentAdvice: React.FC = () => {
     {
       icon: <TrendingUp className="w-8 h-8" />,
       title: t('investment.principle_1'),
-      description: "The younger you start investing, the more time your money has to grow through compounding.",
+      description: t("investment.principle_1_desc"),
     },
     {
       icon: <Shield className="w-8 h-8" />,
       title: t('investment.principle_2'),
-      description: "Spread your investments across different asset classes to reduce risk.",
+      description: t("investment.principle_2_desc"),
     },
     {
       icon: <Zap className="w-8 h-8" />,
       title: t('investment.principle_3'),
-      description: "Regular, consistent contributions are more important than timing the market.",
+      description: t("investment.principle_3_desc"),
     },
     {
       icon: <Award className="w-8 h-8" />,
       title: t('investment.principle_4'),
-      description: "Focus on long-term growth and don't react to short-term market volatility.",
+      description: t("investment.principle_4_desc"),
     },
     {
       icon: <DollarSign className="w-8 h-8" />,
       title: t('investment.principle_5'),
-      description: "High fees can significantly impact your returns over time.",
+      description: t("investment.principle_5_desc"),
     },
   ];
 
@@ -171,7 +171,7 @@ const InvestmentAdvice: React.FC = () => {
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>{t('investment.compound_interest')}</CardTitle>
-            <CardDescription>Calculate your investment growth</CardDescription>
+            <CardDescription>{t("investment.compound_interest_desc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -203,7 +203,7 @@ const InvestmentAdvice: React.FC = () => {
               />
             </div>
             <div>
-              <Label>Inflation Rate (%)</Label>
+              <Label>{t("investment.inflation_rate")}</Label>
               <Input
                 type="number"
                 value={calculator.inflationRate}
@@ -235,7 +235,9 @@ const InvestmentAdvice: React.FC = () => {
                 ${finalData.total.toLocaleString("en-US", { maximumFractionDigits: 2 })}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                After {calculator.years} year{calculator.years !== 1 ? "s" : ""} (Nominal)
+                {calculator.years === 1
+                  ? t("investment.after_years_singular", { years: calculator.years })
+                  : t("investment.after_years_plural", { years: calculator.years })}
               </p>
               {calculator.inflationRate > 0 && (
                 <>
@@ -243,7 +245,7 @@ const InvestmentAdvice: React.FC = () => {
                     ${finalData.realValue.toLocaleString("en-US", { maximumFractionDigits: 2 })}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Real value (adjusted for {calculator.inflationRate}% inflation)
+                    {t("investment.real_value", { rate: calculator.inflationRate })}
                   </p>
                 </>
               )}
@@ -252,11 +254,11 @@ const InvestmentAdvice: React.FC = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Investment Breakdown</CardTitle>
+              <CardTitle className="text-lg">{t("investment.breakdown.title")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Total Principal Invested:</span>
+                <span className="text-muted-foreground">{t("investment.breakdown.total_principal")}:</span>
                 <span className="font-semibold">${finalData.principal.toLocaleString("en-US", { maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-border">
@@ -264,12 +266,12 @@ const InvestmentAdvice: React.FC = () => {
                 <span className="font-semibold text-success">${finalData.interest.toLocaleString("en-US", { maximumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-border">
-                <span className="font-medium">Total Value:</span>
+                <span className="font-medium">{t("investment.breakdown.total_value")}:</span>
                 <span className="font-bold text-primary text-lg">${finalData.total.toLocaleString("en-US", { maximumFractionDigits: 2 })}</span>
               </div>
 
               <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-2">Return on Investment (ROI):</p>
+                <p className="text-xs text-muted-foreground mb-2">{t("investment.breakdown.roi_label")}</p>
                 <p className="text-xl font-bold text-primary">
                   {finalData.principal > 0 ? ((finalData.interest / finalData.principal) * 100).toFixed(1) : 0}%
                 </p>
@@ -282,22 +284,22 @@ const InvestmentAdvice: React.FC = () => {
       {/* Compound Interest Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Growth Projection Over Time</CardTitle>
-          <CardDescription>Your investment value with monthly contributions and compound interest</CardDescription>
+          <CardTitle>{t("investment.chart.title")}</CardTitle>
+          <CardDescription>{t("investment.chart.subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
             <LineChart data={compoundInterestData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="year" label={{ value: "Years", position: "insideBottomRight", offset: -5 }} />
-              <YAxis label={{ value: "Amount ($)", angle: -90, position: "insideLeft" }} />
+              <XAxis dataKey="year" label={{ value: t("investment.chart.years"), position: "insideBottomRight", offset: -5 }} />
+              <YAxis label={{ value: t("investment.chart.amount"), angle: -90, position: "insideLeft" }} />
               <Tooltip
                 formatter={(value: any) => `$${(value as number).toLocaleString("en-US", { maximumFractionDigits: 2 })}`}
               />
               <Legend />
-              <Line type="monotone" dataKey="total" stroke="#0F7173" strokeWidth={2} name="Total Value" />
-              <Line type="monotone" dataKey="principal" stroke="#FFD700" strokeWidth={2} name="Principal Invested" />
-              <Line type="monotone" dataKey="interest" stroke="#90EE90" strokeWidth={2} name="Interest Earned" />
+              <Line type="monotone" dataKey="total" stroke="#0F7173" strokeWidth={2} name={t("investment.chart.total_value")} />
+              <Line type="monotone" dataKey="principal" stroke="#FFD700" strokeWidth={2} name={t("investment.chart.principal_invested")} />
+              <Line type="monotone" dataKey="interest" stroke="#90EE90" strokeWidth={2} name={t("investment.chart.interest_earned")} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -306,29 +308,29 @@ const InvestmentAdvice: React.FC = () => {
       {/* Investment Tips Card */}
       <Card className="mt-12 bg-gradient-to-r from-primary/10 to-accent/10">
         <CardHeader>
-          <CardTitle>Quick Investment Tips</CardTitle>
+          <CardTitle>{t("investment.tips.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="space-y-3">
             <li className="flex gap-3">
               <span className="text-primary font-bold">1.</span>
-              <span>Start with an emergency fund of 3-6 months of expenses before investing.</span>
+              <span>{t("investment.tips.item_1")}</span>
             </li>
             <li className="flex gap-3">
               <span className="text-primary font-bold">2.</span>
-              <span>Consider low-cost index funds or ETFs for diversified, passive investing.</span>
+              <span>{t("investment.tips.item_2")}</span>
             </li>
             <li className="flex gap-3">
               <span className="text-primary font-bold">3.</span>
-              <span>Use tax-advantaged accounts like 401(k) or IRA to maximize returns.</span>
+              <span>{t("investment.tips.item_3")}</span>
             </li>
             <li className="flex gap-3">
               <span className="text-primary font-bold">4.</span>
-              <span>Rebalance your portfolio annually to maintain your target asset allocation.</span>
+              <span>{t("investment.tips.item_4")}</span>
             </li>
             <li className="flex gap-3">
               <span className="text-primary font-bold">5.</span>
-              <span>Consider working with a financial advisor for personalized guidance.</span>
+              <span>{t("investment.tips.item_5")}</span>
             </li>
           </ul>
         </CardContent>

@@ -6,13 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CheckCircle2 } from "lucide-react";
-import { SavingsStrategy } from "@/types/finance";
 
-const strategies: SavingsStrategy[] = [
+const strategies = [
   {
     id: "50_30_20",
-    name: "50/30/20 Rule",
-    description: "50% needs, 30% wants, 20% savings",
+    nameKey: "strategy.50_30_20.name",
+    descriptionKey: "strategy.50_30_20.description",
     breakdown: {
       needs: 50,
       wants: 30,
@@ -21,8 +20,8 @@ const strategies: SavingsStrategy[] = [
   },
   {
     id: "pay_yourself_first",
-    name: "Pay Yourself First",
-    description: "Save 20% first, then spend the rest",
+    nameKey: "strategy.pay_yourself_first.name",
+    descriptionKey: "strategy.pay_yourself_first.description",
     breakdown: {
       needs: 70,
       wants: 10,
@@ -31,8 +30,8 @@ const strategies: SavingsStrategy[] = [
   },
   {
     id: "aggressive_saving",
-    name: "Aggressive Saving",
-    description: "Save 40% or more, minimum expenses",
+    nameKey: "strategy.aggressive_saving.name",
+    descriptionKey: "strategy.aggressive_saving.description",
     breakdown: {
       needs: 40,
       wants: 20,
@@ -41,8 +40,8 @@ const strategies: SavingsStrategy[] = [
   },
   {
     id: "balanced",
-    name: "Balanced Approach",
-    description: "40% needs, 30% wants, 30% savings",
+    nameKey: "strategy.balanced.name",
+    descriptionKey: "strategy.balanced.description",
     breakdown: {
       needs: 40,
       wants: 30,
@@ -51,8 +50,8 @@ const strategies: SavingsStrategy[] = [
   },
   {
     id: "debt_payoff",
-    name: "Debt Payoff Focus",
-    description: "Prioritize debt repayment, save 10%",
+    nameKey: "strategy.debt_payoff.name",
+    descriptionKey: "strategy.debt_payoff.description",
     breakdown: {
       needs: 55,
       wants: 35,
@@ -82,6 +81,16 @@ const SavingsStrategies: React.FC = () => {
 
   const totalMonthlyIncome = data.incomes.reduce((sum, income) => sum + convertToMonthly(income.amount, income.frequency), 0);
   const totalMonthlyExpenses = data.expenses.reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
+  const totalCustomPercent = customBreakdown.needs + customBreakdown.wants + customBreakdown.savings;
+  const selectedStrategyData = strategies.find((strategy) => strategy.id === data.selectedStrategy);
+  const selectedStrategyName = data.selectedStrategy === "custom"
+    ? t("savings_strategies.custom.title")
+    : selectedStrategyData
+      ? t(selectedStrategyData.nameKey)
+      : null;
+  const selectedStrategySavings = data.selectedStrategy === "custom"
+    ? data.customStrategy.savings
+    : selectedStrategyData?.breakdown.savings;
 
   const hasData = data.incomes.length > 0;
 
@@ -100,7 +109,7 @@ const SavingsStrategies: React.FC = () => {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                Add your income and expenses to see personalized strategy recommendations.
+                {t("savings_strategies.no_data_hint")}
               </p>
             </CardContent>
           </Card>
@@ -121,8 +130,8 @@ const SavingsStrategies: React.FC = () => {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-lg">{strategy.name}</CardTitle>
-                      <CardDescription className="mt-1">{strategy.description}</CardDescription>
+                      <CardTitle className="text-lg">{t(strategy.nameKey)}</CardTitle>
+                      <CardDescription className="mt-1">{t(strategy.descriptionKey)}</CardDescription>
                     </div>
                     {data.selectedStrategy === strategy.id && (
                       <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
@@ -156,15 +165,15 @@ const SavingsStrategies: React.FC = () => {
                     <div className="grid grid-cols-3 gap-2 text-xs">
                       <div className="text-center">
                         <div className="font-semibold text-primary">{strategy.breakdown.needs}%</div>
-                        <div className="text-muted-foreground">Needs</div>
+                        <div className="text-muted-foreground">{t("savings_strategies.needs")}</div>
                       </div>
                       <div className="text-center">
                         <div className="font-semibold text-warning">{strategy.breakdown.wants}%</div>
-                        <div className="text-muted-foreground">Wants</div>
+                        <div className="text-muted-foreground">{t("savings_strategies.wants")}</div>
                       </div>
                       <div className="text-center">
                         <div className="font-semibold text-success">{strategy.breakdown.savings}%</div>
-                        <div className="text-muted-foreground">Savings</div>
+                        <div className="text-muted-foreground">{t("savings_strategies.savings")}</div>
                       </div>
                     </div>
                   </div>
@@ -173,15 +182,30 @@ const SavingsStrategies: React.FC = () => {
                   {totalMonthlyIncome > 0 && (
                     <div className="bg-muted/50 rounded-lg p-3 space-y-2 text-xs">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Needs ({strategy.breakdown.needs}%):</span>
+                        <span className="text-muted-foreground">
+                          {t("savings_strategies.amount_label", {
+                            label: t("savings_strategies.needs"),
+                            percent: strategy.breakdown.needs,
+                          })}
+                        </span>
                         <span className="font-semibold">${((totalMonthlyIncome * strategy.breakdown.needs) / 100).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Wants ({strategy.breakdown.wants}%):</span>
+                        <span className="text-muted-foreground">
+                          {t("savings_strategies.amount_label", {
+                            label: t("savings_strategies.wants"),
+                            percent: strategy.breakdown.wants,
+                          })}
+                        </span>
                         <span className="font-semibold">${((totalMonthlyIncome * strategy.breakdown.wants) / 100).toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between border-t border-border pt-2">
-                        <span className="text-muted-foreground font-medium">Savings ({strategy.breakdown.savings}%):</span>
+                        <span className="text-muted-foreground font-medium">
+                          {t("savings_strategies.amount_label", {
+                            label: t("savings_strategies.savings"),
+                            percent: strategy.breakdown.savings,
+                          })}
+                        </span>
                         <span className="font-bold text-success">${((totalMonthlyIncome * strategy.breakdown.savings) / 100).toFixed(2)}</span>
                       </div>
                     </div>
@@ -210,8 +234,8 @@ const SavingsStrategies: React.FC = () => {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-lg">Custom Strategy</CardTitle>
-                    <CardDescription className="mt-1">Create your own allocation</CardDescription>
+                    <CardTitle className="text-lg">{t("savings_strategies.custom.title")}</CardTitle>
+                    <CardDescription className="mt-1">{t("savings_strategies.custom.description")}</CardDescription>
                   </div>
                   {data.selectedStrategy === "custom" && (
                     <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
@@ -222,7 +246,7 @@ const SavingsStrategies: React.FC = () => {
                 {/* Custom Input Fields */}
                 <div className="space-y-3">
                   <div>
-                    <Label className="text-xs">Needs (%)</Label>
+                    <Label className="text-xs">{t("savings_strategies.custom.needs_label")}</Label>
                     <Input
                       type="number"
                       min="0"
@@ -236,7 +260,7 @@ const SavingsStrategies: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs">Wants (%)</Label>
+                    <Label className="text-xs">{t("savings_strategies.custom.wants_label")}</Label>
                     <Input
                       type="number"
                       min="0"
@@ -250,7 +274,7 @@ const SavingsStrategies: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <Label className="text-xs">Savings (%)</Label>
+                    <Label className="text-xs">{t("savings_strategies.custom.savings_label")}</Label>
                     <Input
                       type="number"
                       min="0"
@@ -267,14 +291,14 @@ const SavingsStrategies: React.FC = () => {
                   {/* Total Validation */}
                   <div className="text-xs">
                     <span className={`font-medium ${
-                      customBreakdown.needs + customBreakdown.wants + customBreakdown.savings === 100
+                      totalCustomPercent === 100
                         ? "text-success"
                         : "text-destructive"
                     }`}>
-                      Total: {customBreakdown.needs + customBreakdown.wants + customBreakdown.savings}%
+                      {t("savings_strategies.custom.total_label", { total: totalCustomPercent })}
                     </span>
-                    {customBreakdown.needs + customBreakdown.wants + customBreakdown.savings !== 100 && (
-                      <span className="text-muted-foreground ml-2">(must equal 100%)</span>
+                    {totalCustomPercent !== 100 && (
+                      <span className="text-muted-foreground ml-2">{t("savings_strategies.custom.total_hint")}</span>
                     )}
                   </div>
                 </div>
@@ -307,15 +331,30 @@ const SavingsStrategies: React.FC = () => {
                 {totalMonthlyIncome > 0 && (
                   <div className="bg-muted/50 rounded-lg p-3 space-y-2 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Needs ({customBreakdown.needs}%):</span>
+                      <span className="text-muted-foreground">
+                        {t("savings_strategies.amount_label", {
+                          label: t("savings_strategies.needs"),
+                          percent: customBreakdown.needs,
+                        })}
+                      </span>
                       <span className="font-semibold">${((totalMonthlyIncome * customBreakdown.needs) / 100).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Wants ({customBreakdown.wants}%):</span>
+                      <span className="text-muted-foreground">
+                        {t("savings_strategies.amount_label", {
+                          label: t("savings_strategies.wants"),
+                          percent: customBreakdown.wants,
+                        })}
+                      </span>
                       <span className="font-semibold">${((totalMonthlyIncome * customBreakdown.wants) / 100).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between border-t border-border pt-2">
-                      <span className="text-muted-foreground font-medium">Savings ({customBreakdown.savings}%):</span>
+                      <span className="text-muted-foreground font-medium">
+                        {t("savings_strategies.amount_label", {
+                          label: t("savings_strategies.savings"),
+                          percent: customBreakdown.savings,
+                        })}
+                      </span>
                       <span className="font-bold text-success">${((totalMonthlyIncome * customBreakdown.savings) / 100).toFixed(2)}</span>
                     </div>
                   </div>
@@ -324,16 +363,18 @@ const SavingsStrategies: React.FC = () => {
                 {/* Apply Button */}
                 <Button
                   onClick={() => {
-                    if (customBreakdown.needs + customBreakdown.wants + customBreakdown.savings === 100) {
+                    if (totalCustomPercent === 100) {
                       setCustomStrategy(customBreakdown);
                       setSelectedStrategy("custom");
                     }
                   }}
                   variant={data.selectedStrategy === "custom" ? "default" : "outline"}
                   className="w-full"
-                  disabled={customBreakdown.needs + customBreakdown.wants + customBreakdown.savings !== 100}
+                  disabled={totalCustomPercent !== 100}
                 >
-                  {data.selectedStrategy === "custom" ? "Selected" : "Apply Custom Strategy"}
+                  {data.selectedStrategy === "custom"
+                    ? t("savings_strategies.selected_button")
+                    : t("savings_strategies.custom.apply")}
                 </Button>
               </CardContent>
             </Card>
@@ -343,21 +384,21 @@ const SavingsStrategies: React.FC = () => {
           {totalMonthlyIncome > 0 && (
             <Card className="mt-8 bg-gradient-to-br from-muted/50 to-muted/30">
               <CardHeader>
-                <CardTitle>Your Current Financial Situation</CardTitle>
-                <CardDescription>Based on your income and expenses</CardDescription>
+                <CardTitle>{t("savings_strategies.current.title")}</CardTitle>
+                <CardDescription>{t("savings_strategies.current.subtitle")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Monthly Income</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t("savings_strategies.current.monthly_income")}</p>
                     <p className="text-2xl font-bold text-foreground">${totalMonthlyIncome.toFixed(2)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Monthly Expenses</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t("savings_strategies.current.monthly_expenses")}</p>
                     <p className="text-2xl font-bold text-foreground">${totalMonthlyExpenses.toFixed(2)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Available for Savings</p>
+                    <p className="text-sm text-muted-foreground mb-1">{t("savings_strategies.current.available_savings")}</p>
                     <p className={`text-2xl font-bold ${(totalMonthlyIncome - totalMonthlyExpenses) >= 0 ? 'text-success' : 'text-destructive'}`}>
                       ${(totalMonthlyIncome - totalMonthlyExpenses).toFixed(2)}
                     </p>
@@ -365,14 +406,17 @@ const SavingsStrategies: React.FC = () => {
                 </div>
 
                 <div className="mt-6 p-4 bg-background rounded-lg border border-border">
-                  <p className="text-sm text-muted-foreground mb-2">Strategy Recommendation:</p>
-                  {data.selectedStrategy ? (
+                  <p className="text-sm text-muted-foreground mb-2">{t("savings_strategies.recommendation.title")}</p>
+                  {data.selectedStrategy && selectedStrategyName && typeof selectedStrategySavings === "number" ? (
                     <p className="text-foreground font-medium">
-                      {t('savings_strategies.select')} <span className="text-primary">{strategies.find(s => s.id === data.selectedStrategy)?.name}</span>. This strategy suggests saving {strategies.find(s => s.id === data.selectedStrategy)?.breakdown.savings}% of your income monthly.
+                      {t("savings_strategies.recommendation.with_selection", {
+                        strategy: selectedStrategyName,
+                        percent: selectedStrategySavings,
+                      })}
                     </p>
                   ) : (
                     <p className="text-muted-foreground">
-                      Select a strategy above to get personalized recommendations based on your financial situation.
+                      {t("savings_strategies.recommendation.no_selection")}
                     </p>
                   )}
                 </div>
