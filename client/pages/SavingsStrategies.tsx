@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useFinance } from "@/context/FinanceContext";
 import { Button } from "@/components/ui/button";
@@ -77,140 +77,8 @@ const convertToMonthly = (amount: number, frequency: string): number => {
 const SavingsStrategies: React.FC = () => {
   const { t } = useTranslation();
   const { data, setSelectedStrategy, setCustomStrategy } = useFinance();
-
+  
   const [customBreakdown, setCustomBreakdown] = useState(data.customStrategy);
-  const [isDragging, setIsDragging] = useState<'needs-wants' | 'wants-savings' | null>(null);
-  const barRef = useRef<HTMLDivElement>(null);
-
-  // Auto-adjust to maintain 100% total
-  const adjustBreakdown = (field: 'needs' | 'wants' | 'savings', value: number) => {
-    const clampedValue = Math.max(0, Math.min(100, value));
-
-    if (field === 'needs') {
-      const remaining = 100 - clampedValue;
-      const currentOthers = customBreakdown.wants + customBreakdown.savings;
-      const ratio = currentOthers > 0 ? remaining / currentOthers : 0.5;
-
-      setCustomBreakdown({
-        needs: Math.round(clampedValue),
-        wants: currentOthers > 0 ? Math.round(customBreakdown.wants * ratio) : Math.round(remaining * 0.5),
-        savings: currentOthers > 0 ? Math.round(customBreakdown.savings * ratio) : Math.round(remaining * 0.5),
-      });
-    } else if (field === 'wants') {
-      const remaining = 100 - clampedValue;
-      const currentOthers = customBreakdown.needs + customBreakdown.savings;
-      const ratio = currentOthers > 0 ? remaining / currentOthers : 0.5;
-
-      setCustomBreakdown({
-        needs: currentOthers > 0 ? Math.round(customBreakdown.needs * ratio) : Math.round(remaining * 0.5),
-        wants: Math.round(clampedValue),
-        savings: currentOthers > 0 ? Math.round(customBreakdown.savings * ratio) : Math.round(remaining * 0.5),
-      });
-    } else {
-      const remaining = 100 - clampedValue;
-      const currentOthers = customBreakdown.needs + customBreakdown.wants;
-      const ratio = currentOthers > 0 ? remaining / currentOthers : 0.5;
-
-      setCustomBreakdown({
-        needs: currentOthers > 0 ? Math.round(customBreakdown.needs * ratio) : Math.round(remaining * 0.5),
-        wants: currentOthers > 0 ? Math.round(customBreakdown.wants * ratio) : Math.round(remaining * 0.5),
-        savings: Math.round(clampedValue),
-      });
-    }
-  };
-
-  // Handle dragging on the progress bar
-  const handleDragStart = (boundary: 'needs-wants' | 'wants-savings') => {
-    setIsDragging(boundary);
-  };
-
-  const handleDragMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging || !barRef.current) return;
-
-    const rect = barRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-
-    if (isDragging === 'needs-wants') {
-      // Dragging the boundary between needs and wants
-      const newNeeds = Math.round(percentage);
-      const remaining = 100 - newNeeds;
-      const currentOthers = customBreakdown.wants + customBreakdown.savings;
-      const ratio = currentOthers > 0 ? remaining / currentOthers : 0.5;
-
-      setCustomBreakdown({
-        needs: newNeeds,
-        wants: Math.round(customBreakdown.wants * ratio),
-        savings: Math.round(customBreakdown.savings * ratio),
-      });
-    } else if (isDragging === 'wants-savings') {
-      // Dragging the boundary between wants and savings
-      const needsWants = Math.round(percentage);
-      const newWants = needsWants - customBreakdown.needs;
-      const newSavings = 100 - needsWants;
-
-      if (newWants >= 0 && newSavings >= 0) {
-        setCustomBreakdown({
-          needs: customBreakdown.needs,
-          wants: newWants,
-          savings: newSavings,
-        });
-      }
-    }
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(null);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      const handleMouseMove = (e: MouseEvent) => {
-        if (!barRef.current) return;
-
-        const rect = barRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-
-        if (isDragging === 'needs-wants') {
-          const newNeeds = Math.round(percentage);
-          const remaining = 100 - newNeeds;
-          const currentOthers = customBreakdown.wants + customBreakdown.savings;
-          const ratio = currentOthers > 0 ? remaining / currentOthers : 0.5;
-
-          setCustomBreakdown({
-            needs: newNeeds,
-            wants: Math.round(customBreakdown.wants * ratio),
-            savings: Math.round(customBreakdown.savings * ratio),
-          });
-        } else if (isDragging === 'wants-savings') {
-          const needsWants = Math.round(percentage);
-          const newWants = needsWants - customBreakdown.needs;
-          const newSavings = 100 - needsWants;
-
-          if (newWants >= 0 && newSavings >= 0) {
-            setCustomBreakdown({
-              needs: customBreakdown.needs,
-              wants: newWants,
-              savings: newSavings,
-            });
-          }
-        }
-      };
-
-      const handleMouseUp = () => {
-        setIsDragging(null);
-      };
-
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging, customBreakdown]);
 
   const totalMonthlyIncome = data.incomes.reduce((sum, income) => sum + convertToMonthly(income.amount, income.frequency), 0);
   const totalMonthlyExpenses = data.expenses.reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
@@ -361,11 +229,10 @@ const SavingsStrategies: React.FC = () => {
                       max="100"
                       value={customBreakdown.needs}
                       onChange={(e) => {
-                        const needs = parseInt(e.target.value);
-                        adjustBreakdown('needs', isNaN(needs) ? 0 : needs);
+                        const needs = parseInt(e.target.value) || 0;
+                        setCustomBreakdown({ ...customBreakdown, needs });
                       }}
                       className="h-8"
-                      onFocus={(e) => e.target.select()}
                     />
                   </div>
                   <div>
@@ -376,11 +243,10 @@ const SavingsStrategies: React.FC = () => {
                       max="100"
                       value={customBreakdown.wants}
                       onChange={(e) => {
-                        const wants = parseInt(e.target.value);
-                        adjustBreakdown('wants', isNaN(wants) ? 0 : wants);
+                        const wants = parseInt(e.target.value) || 0;
+                        setCustomBreakdown({ ...customBreakdown, wants });
                       }}
                       className="h-8"
-                      onFocus={(e) => e.target.select()}
                     />
                   </div>
                   <div>
@@ -391,78 +257,48 @@ const SavingsStrategies: React.FC = () => {
                       max="100"
                       value={customBreakdown.savings}
                       onChange={(e) => {
-                        const savings = parseInt(e.target.value);
-                        adjustBreakdown('savings', isNaN(savings) ? 0 : savings);
+                        const savings = parseInt(e.target.value) || 0;
+                        setCustomBreakdown({ ...customBreakdown, savings });
                       }}
                       className="h-8"
-                      onFocus={(e) => e.target.select()}
                     />
                   </div>
-
+                  
                   {/* Total Validation */}
                   <div className="text-xs">
-                    <span className="font-medium text-success">
+                    <span className={`font-medium ${
+                      customBreakdown.needs + customBreakdown.wants + customBreakdown.savings === 100
+                        ? "text-success"
+                        : "text-destructive"
+                    }`}>
                       Total: {customBreakdown.needs + customBreakdown.wants + customBreakdown.savings}%
                     </span>
-                    <span className="text-muted-foreground ml-2">(auto-adjusted)</span>
+                    {customBreakdown.needs + customBreakdown.wants + customBreakdown.savings !== 100 && (
+                      <span className="text-muted-foreground ml-2">(must equal 100%)</span>
+                    )}
                   </div>
                 </div>
 
-                {/* Interactive Breakdown Visualization */}
+                {/* Breakdown Visualization */}
                 <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">Drag the dividers to adjust</Label>
-                  <div
-                    ref={barRef}
-                    className="relative h-12 rounded-lg overflow-hidden bg-muted select-none"
-                    style={{ cursor: isDragging ? 'col-resize' : 'default' }}
-                  >
-                    {/* Needs section */}
+                  <div className="flex gap-2 h-8 rounded-lg overflow-hidden bg-muted">
                     <div
-                      className="absolute top-0 left-0 h-full bg-primary flex items-center justify-center text-xs font-semibold text-primary-foreground transition-all"
+                      className="bg-primary flex items-center justify-center text-xs font-semibold text-primary-foreground"
                       style={{ width: `${customBreakdown.needs}%` }}
                     >
-                      <span>Needs {customBreakdown.needs}%</span>
+                      {customBreakdown.needs > 15 && `${customBreakdown.needs}%`}
                     </div>
-
-                    {/* Wants section */}
                     <div
-                      className="absolute top-0 h-full bg-warning flex items-center justify-center text-xs font-semibold text-warning-foreground transition-all"
-                      style={{
-                        left: `${customBreakdown.needs}%`,
-                        width: `${customBreakdown.wants}%`,
-                      }}
+                      className="bg-warning flex items-center justify-center text-xs font-semibold text-warning-foreground"
+                      style={{ width: `${customBreakdown.wants}%` }}
                     >
-                      <span>Wants {customBreakdown.wants}%</span>
+                      {customBreakdown.wants > 15 && `${customBreakdown.wants}%`}
                     </div>
-
-                    {/* Savings section */}
                     <div
-                      className="absolute top-0 right-0 h-full bg-success flex items-center justify-center text-xs font-semibold text-success-foreground transition-all"
+                      className="bg-success flex items-center justify-center text-xs font-semibold text-success-foreground"
                       style={{ width: `${customBreakdown.savings}%` }}
                     >
-                      <span>Savings {customBreakdown.savings}%</span>
-                    </div>
-
-                    {/* Draggable handle between Needs and Wants */}
-                    <div
-                      className="absolute top-0 h-full w-1 bg-background cursor-col-resize hover:w-2 hover:bg-primary/50 transition-all z-10 group"
-                      style={{ left: `${customBreakdown.needs}%`, transform: 'translateX(-50%)' }}
-                      onMouseDown={() => handleDragStart('needs-wants')}
-                    >
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-8 bg-background border-2 border-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <div className="w-0.5 h-4 bg-primary"></div>
-                      </div>
-                    </div>
-
-                    {/* Draggable handle between Wants and Savings */}
-                    <div
-                      className="absolute top-0 h-full w-1 bg-background cursor-col-resize hover:w-2 hover:bg-primary/50 transition-all z-10 group"
-                      style={{ left: `${customBreakdown.needs + customBreakdown.wants}%`, transform: 'translateX(-50%)' }}
-                      onMouseDown={() => handleDragStart('wants-savings')}
-                    >
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-8 bg-background border-2 border-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <div className="w-0.5 h-4 bg-primary"></div>
-                      </div>
+                      {customBreakdown.savings > 15 && `${customBreakdown.savings}%`}
                     </div>
                   </div>
                 </div>
@@ -488,13 +324,16 @@ const SavingsStrategies: React.FC = () => {
                 {/* Apply Button */}
                 <Button
                   onClick={() => {
-                    setCustomStrategy(customBreakdown);
-                    setSelectedStrategy("custom");
+                    if (customBreakdown.needs + customBreakdown.wants + customBreakdown.savings === 100) {
+                      setCustomStrategy(customBreakdown);
+                      setSelectedStrategy("custom");
+                    }
                   }}
                   variant={data.selectedStrategy === "custom" ? "default" : "outline"}
                   className="w-full"
+                  disabled={customBreakdown.needs + customBreakdown.wants + customBreakdown.savings !== 100}
                 >
-                  {data.selectedStrategy === "custom" ? "✓ Selected" : "Apply Custom Strategy"}
+                  {data.selectedStrategy === "custom" ? "Selected" : "Apply Custom Strategy"}
                 </Button>
               </CardContent>
             </Card>

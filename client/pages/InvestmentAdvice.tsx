@@ -179,12 +179,8 @@ const InvestmentAdvice: React.FC = () => {
               <Input
                 type="number"
                 value={calculator.initialAmount}
-                onChange={(e) => {
-                  const val = parseFloat(e.target.value);
-                  setCalculator({ ...calculator, initialAmount: isNaN(val) ? 0 : val });
-                }}
+                onChange={(e) => setCalculator({ ...calculator, initialAmount: parseFloat(e.target.value) || 0 })}
                 placeholder="0"
-                onFocus={(e) => e.target.select()}
               />
             </div>
             <div>
@@ -192,12 +188,8 @@ const InvestmentAdvice: React.FC = () => {
               <Input
                 type="number"
                 value={calculator.monthlyContribution}
-                onChange={(e) => {
-                  const val = parseFloat(e.target.value);
-                  setCalculator({ ...calculator, monthlyContribution: isNaN(val) ? 0 : val });
-                }}
+                onChange={(e) => setCalculator({ ...calculator, monthlyContribution: parseFloat(e.target.value) || 0 })}
                 placeholder="0"
-                onFocus={(e) => e.target.select()}
               />
             </div>
             <div>
@@ -205,13 +197,9 @@ const InvestmentAdvice: React.FC = () => {
               <Input
                 type="number"
                 value={calculator.annualReturn}
-                onChange={(e) => {
-                  const val = parseFloat(e.target.value);
-                  setCalculator({ ...calculator, annualReturn: isNaN(val) ? 0 : val });
-                }}
+                onChange={(e) => setCalculator({ ...calculator, annualReturn: parseFloat(e.target.value) || 0 })}
                 placeholder="7"
                 step="0.1"
-                onFocus={(e) => e.target.select()}
               />
             </div>
             <div>
@@ -219,13 +207,9 @@ const InvestmentAdvice: React.FC = () => {
               <Input
                 type="number"
                 value={calculator.inflationRate}
-                onChange={(e) => {
-                  const val = parseFloat(e.target.value);
-                  setCalculator({ ...calculator, inflationRate: isNaN(val) ? 0 : val });
-                }}
+                onChange={(e) => setCalculator({ ...calculator, inflationRate: parseFloat(e.target.value) || 0 })}
                 placeholder="2.5"
                 step="0.1"
-                onFocus={(e) => e.target.select()}
               />
             </div>
             <div>
@@ -233,12 +217,8 @@ const InvestmentAdvice: React.FC = () => {
               <Input
                 type="number"
                 value={calculator.years}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value);
-                  setCalculator({ ...calculator, years: isNaN(val) ? 0 : val });
-                }}
+                onChange={(e) => setCalculator({ ...calculator, years: parseInt(e.target.value) || 0 })}
                 placeholder="10"
-                onFocus={(e) => e.target.select()}
               />
             </div>
           </CardContent>
