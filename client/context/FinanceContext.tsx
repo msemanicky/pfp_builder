@@ -61,7 +61,12 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as FinanceData;
-        setData(parsed);
+        // Migration: Add default type to expenses that don't have it
+        const migratedExpenses = parsed.expenses.map((expense) => ({
+          ...expense,
+          type: expense.type || "need", // Default to "need" for backward compatibility
+        })) as Expense[];
+        setData({ ...parsed, expenses: migratedExpenses });
       } catch (e) {
         console.error("Failed to load finance data from session", e);
       }
@@ -165,7 +170,25 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         Array.isArray(parsed.debts) &&
         typeof parsed.language === "string"
       ) {
-        setData(parsed);
+        // Migration: Add default type to expenses that don't have it
+        const migratedExpenses = parsed.expenses.map((expense) => ({
+          ...expense,
+          type: expense.type || "need", // Default to "need" for backward compatibility
+        })) as Expense[];
+
+        // Ensure selectedStrategy and customStrategy exist
+        const migratedData: FinanceData = {
+          ...parsed,
+          expenses: migratedExpenses,
+          selectedStrategy: parsed.selectedStrategy ?? null,
+          customStrategy: parsed.customStrategy ?? {
+            needs: 50,
+            wants: 30,
+            savings: 20,
+          },
+        };
+
+        setData(migratedData);
         return true;
       }
       return false;

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Info } from "lucide-react";
 
 const strategies = [
   {
@@ -81,6 +81,25 @@ const SavingsStrategies: React.FC = () => {
 
   const totalMonthlyIncome = data.incomes.reduce((sum, income) => sum + convertToMonthly(income.amount, income.frequency), 0);
   const totalMonthlyExpenses = data.expenses.reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
+
+  // Calculate actual allocation based on categorized expenses
+  const actualNeedsExpenses = data.expenses
+    .filter(expense => expense.type === "need")
+    .reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
+  const actualWantsExpenses = data.expenses
+    .filter(expense => expense.type === "want")
+    .reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
+  const actualSavingsExpenses = data.expenses
+    .filter(expense => expense.type === "savings")
+    .reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
+  // Actual savings includes both savings-type expenses and leftover income
+  const actualSavings = actualSavingsExpenses + (totalMonthlyIncome - totalMonthlyExpenses);
+
+  // Calculate actual percentages
+  const actualNeedsPercent = totalMonthlyIncome > 0 ? (actualNeedsExpenses / totalMonthlyIncome) * 100 : 0;
+  const actualWantsPercent = totalMonthlyIncome > 0 ? (actualWantsExpenses / totalMonthlyIncome) * 100 : 0;
+  const actualSavingsPercent = totalMonthlyIncome > 0 ? (actualSavings / totalMonthlyIncome) * 100 : 0;
+
   const totalCustomPercent = customBreakdown.needs + customBreakdown.wants + customBreakdown.savings;
   const selectedStrategyData = strategies.find((strategy) => strategy.id === data.selectedStrategy);
   const selectedStrategyName = data.selectedStrategy === "custom"
@@ -92,6 +111,10 @@ const SavingsStrategies: React.FC = () => {
     ? data.customStrategy.savings
     : selectedStrategyData?.breakdown.savings;
 
+  const selectedStrategyBreakdown = data.selectedStrategy === "custom"
+    ? data.customStrategy
+    : selectedStrategyData?.breakdown;
+
   const hasData = data.incomes.length > 0;
 
   return (
@@ -100,6 +123,41 @@ const SavingsStrategies: React.FC = () => {
         <h1 className="text-4xl font-bold text-foreground mb-2">{t('savings_strategies.title')}</h1>
         <p className="text-lg text-muted-foreground">{t('savings_strategies.subtitle')}</p>
       </div>
+
+      {/* Terms Explanation Card */}
+      <Card className="mb-8 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-900">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <CardTitle className="text-lg">{t('savings_strategies.terms_explanation')}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-primary"></div>
+                <h3 className="font-semibold text-primary">{t('savings_strategies.needs')}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">{t('savings_strategies.needs_desc')}</p>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-warning"></div>
+                <h3 className="font-semibold text-warning">{t('savings_strategies.wants')}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">{t('savings_strategies.wants_desc')}</p>
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-success"></div>
+                <h3 className="font-semibold text-success">{t('savings_strategies.savings')}</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">{t('savings_strategies.savings_desc')}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {!hasData ? (
         <div className="max-w-md mx-auto text-center">
@@ -419,6 +477,124 @@ const SavingsStrategies: React.FC = () => {
                       {t("savings_strategies.recommendation.no_selection")}
                     </p>
                   )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Actual vs Recommended Comparison */}
+          {totalMonthlyIncome > 0 && data.selectedStrategy && selectedStrategyBreakdown && data.expenses.length > 0 && (
+            <Card className="mt-6 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 border-purple-200 dark:border-purple-900">
+              <CardHeader>
+                <CardTitle>{t("savings_strategies.actual_allocation.title")}</CardTitle>
+                <CardDescription>{t("savings_strategies.actual_allocation.subtitle")}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Needs Comparison */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-primary"></div>
+                        <span className="font-semibold text-primary">{t("savings_strategies.needs")}</span>
+                      </div>
+                      <div className="text-sm">
+                        {actualNeedsPercent > selectedStrategyBreakdown.needs ? (
+                          <span className="text-destructive font-medium">
+                            {t("savings_strategies.comparison.over", { amount: (actualNeedsPercent - selectedStrategyBreakdown.needs).toFixed(1) })}
+                          </span>
+                        ) : actualNeedsPercent < selectedStrategyBreakdown.needs ? (
+                          <span className="text-success font-medium">
+                            {t("savings_strategies.comparison.under", { amount: (selectedStrategyBreakdown.needs - actualNeedsPercent).toFixed(1) })}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">{t("savings_strategies.comparison.on_target")}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-background/50 rounded-lg p-3">
+                        <p className="text-xs text-muted-foreground mb-1">{t("savings_strategies.comparison.recommended")}</p>
+                        <p className="text-lg font-bold text-primary">{selectedStrategyBreakdown.needs}%</p>
+                        <p className="text-xs text-muted-foreground">${((totalMonthlyIncome * selectedStrategyBreakdown.needs) / 100).toFixed(2)}</p>
+                      </div>
+                      <div className="bg-background/50 rounded-lg p-3">
+                        <p className="text-xs text-muted-foreground mb-1">{t("savings_strategies.comparison.actual")}</p>
+                        <p className="text-lg font-bold text-primary">{actualNeedsPercent.toFixed(1)}%</p>
+                        <p className="text-xs text-muted-foreground">${actualNeedsExpenses.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Wants Comparison */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-warning"></div>
+                        <span className="font-semibold text-warning">{t("savings_strategies.wants")}</span>
+                      </div>
+                      <div className="text-sm">
+                        {actualWantsPercent > selectedStrategyBreakdown.wants ? (
+                          <span className="text-destructive font-medium">
+                            {t("savings_strategies.comparison.over", { amount: (actualWantsPercent - selectedStrategyBreakdown.wants).toFixed(1) })}
+                          </span>
+                        ) : actualWantsPercent < selectedStrategyBreakdown.wants ? (
+                          <span className="text-success font-medium">
+                            {t("savings_strategies.comparison.under", { amount: (selectedStrategyBreakdown.wants - actualWantsPercent).toFixed(1) })}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">{t("savings_strategies.comparison.on_target")}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-background/50 rounded-lg p-3">
+                        <p className="text-xs text-muted-foreground mb-1">{t("savings_strategies.comparison.recommended")}</p>
+                        <p className="text-lg font-bold text-warning">{selectedStrategyBreakdown.wants}%</p>
+                        <p className="text-xs text-muted-foreground">${((totalMonthlyIncome * selectedStrategyBreakdown.wants) / 100).toFixed(2)}</p>
+                      </div>
+                      <div className="bg-background/50 rounded-lg p-3">
+                        <p className="text-xs text-muted-foreground mb-1">{t("savings_strategies.comparison.actual")}</p>
+                        <p className="text-lg font-bold text-warning">{actualWantsPercent.toFixed(1)}%</p>
+                        <p className="text-xs text-muted-foreground">${actualWantsExpenses.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Savings Comparison */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-success"></div>
+                        <span className="font-semibold text-success">{t("savings_strategies.savings")}</span>
+                      </div>
+                      <div className="text-sm">
+                        {actualSavingsPercent < selectedStrategyBreakdown.savings ? (
+                          <span className="text-destructive font-medium">
+                            {t("savings_strategies.comparison.under", { amount: (selectedStrategyBreakdown.savings - actualSavingsPercent).toFixed(1) })}
+                          </span>
+                        ) : actualSavingsPercent > selectedStrategyBreakdown.savings ? (
+                          <span className="text-success font-medium">
+                            {t("savings_strategies.comparison.over", { amount: (actualSavingsPercent - selectedStrategyBreakdown.savings).toFixed(1) })}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">{t("savings_strategies.comparison.on_target")}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-background/50 rounded-lg p-3">
+                        <p className="text-xs text-muted-foreground mb-1">{t("savings_strategies.comparison.recommended")}</p>
+                        <p className="text-lg font-bold text-success">{selectedStrategyBreakdown.savings}%</p>
+                        <p className="text-xs text-muted-foreground">${((totalMonthlyIncome * selectedStrategyBreakdown.savings) / 100).toFixed(2)}</p>
+                      </div>
+                      <div className="bg-background/50 rounded-lg p-3">
+                        <p className="text-xs text-muted-foreground mb-1">{t("savings_strategies.comparison.actual")}</p>
+                        <p className="text-lg font-bold text-success">{actualSavingsPercent.toFixed(1)}%</p>
+                        <p className="text-xs text-muted-foreground">${actualSavings.toFixed(2)}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

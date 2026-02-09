@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Edit2, Plus } from "lucide-react";
+import { Trash2, Edit2, Plus, Info } from "lucide-react";
 import { Income, Expense, Debt } from "@/types/finance";
 
 const FinancialInput: React.FC = () => {
@@ -25,7 +25,7 @@ const FinancialInput: React.FC = () => {
   const [editingIncomeId, setEditingIncomeId] = useState<string | null>(null);
 
   // Expense Form State
-  const [expenseForm, setExpenseForm] = useState<{ name: string; amount: string | number; category: string; frequency: string }>({ name: "", amount: "", category: "other", frequency: "monthly" });
+  const [expenseForm, setExpenseForm] = useState<{ name: string; amount: string | number; category: string; frequency: string; type: string }>({ name: "", amount: "", category: "other", frequency: "monthly", type: "need" });
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
 
   // Debt Form State
@@ -77,6 +77,7 @@ const FinancialInput: React.FC = () => {
         amount: amount,
         category: expenseForm.category as any,
         frequency: expenseForm.frequency as any,
+        type: expenseForm.type as any,
       });
       setEditingExpenseId(null);
     } else {
@@ -85,9 +86,10 @@ const FinancialInput: React.FC = () => {
         amount: amount,
         category: expenseForm.category as any,
         frequency: expenseForm.frequency as any,
+        type: expenseForm.type as any,
       });
     }
-    setExpenseForm({ name: "", amount: "", category: "other", frequency: "monthly" });
+    setExpenseForm({ name: "", amount: "", category: "other", frequency: "monthly", type: "need" });
   };
 
   const handleEditExpense = (expense: Expense) => {
@@ -96,6 +98,7 @@ const FinancialInput: React.FC = () => {
       amount: expense.amount,
       category: expense.category,
       frequency: expense.frequency,
+      type: expense.type,
     });
     setEditingExpenseId(expense.id);
   };
@@ -299,6 +302,42 @@ const FinancialInput: React.FC = () => {
                   </Select>
                 </div>
                 <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Label>{t('financial_input.type')}</Label>
+                    <div className="group relative">
+                      <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                      <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-popover text-popover-foreground text-xs rounded-md shadow-lg border z-10">
+                        {t('financial_input.type_help')}
+                      </div>
+                    </div>
+                  </div>
+                  <Select value={expenseForm.type} onValueChange={(value) => setExpenseForm({ ...expenseForm, type: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="need">
+                        <div>
+                          <div className="font-medium">{t('expense_type.need')}</div>
+                          <div className="text-xs text-muted-foreground">{t('expense_type.need_short')}</div>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="want">
+                        <div>
+                          <div className="font-medium">{t('expense_type.want')}</div>
+                          <div className="text-xs text-muted-foreground">{t('expense_type.want_short')}</div>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="savings">
+                        <div>
+                          <div className="font-medium">{t('expense_type.savings')}</div>
+                          <div className="text-xs text-muted-foreground">{t('expense_type.savings_short')}</div>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
                   <Label>{t('financial_input.frequency')}</Label>
                   <Select value={expenseForm.frequency} onValueChange={(value) => setExpenseForm({ ...expenseForm, frequency: value })}>
                     <SelectTrigger>
@@ -322,7 +361,7 @@ const FinancialInput: React.FC = () => {
                     <Button
                       onClick={() => {
                         setEditingExpenseId(null);
-                        setExpenseForm({ name: "", amount: 0, category: "other", frequency: "monthly" });
+                        setExpenseForm({ name: "", amount: 0, category: "other", frequency: "monthly", type: "need" });
                       }}
                       variant="outline"
                     >
@@ -343,7 +382,18 @@ const FinancialInput: React.FC = () => {
                   {data.expenses.map((expense) => (
                     <div key={expense.id} className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-muted/50 transition-colors">
                       <div className="flex-1">
-                        <p className="font-medium text-foreground">{expense.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-foreground">{expense.name}</p>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            expense.type === 'need'
+                              ? 'bg-primary/10 text-primary'
+                              : expense.type === 'want'
+                              ? 'bg-warning/10 text-warning'
+                              : 'bg-success/10 text-success'
+                          }`}>
+                            {t(`expense_type.${expense.type}`)}
+                          </span>
+                        </div>
                         <p className="text-sm text-muted-foreground">
                           ${expense.amount.toFixed(2)} {t(`frequency.${expense.frequency}`)} • {t(`category.${expense.category}`)}
                         </p>

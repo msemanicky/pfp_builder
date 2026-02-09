@@ -1,8 +1,38 @@
-# Fusion Starter
+# Personal Finance Planner
 
-A production-ready full-stack React application template with integrated Express server, featuring React Router 6 SPA mode, TypeScript, Vitest, Zod and modern tooling.
+> **Note:** This app is built on the Fusion Starter template. See sections below for both app-specific and framework-specific information.
 
-While the starter comes with a express server, only create endpoint when strictly neccesary, for example to encapsulate logic that must leave in the server, such as private keys handling, or certain DB operations, db...
+A production-ready Personal Finance Planner application built with React, TypeScript, and Express. Helps users manage income, expenses, debts, and plan their financial future with interactive strategies and analytics.
+
+**👉 For detailed development guidelines, see [CLAUDE.md](./CLAUDE.md)**
+
+## App-Specific Quick Reference
+
+### Finance Data Model
+- **Incomes** - Track income sources with frequency (monthly, annual, weekly, biweekly)
+- **Expenses** - Categorized expenses with **type classification** (need vs want)
+- **Debts** - Track debts with interest rates and payment schedules
+- **Strategies** - Savings strategies (50/30/20, custom, etc.)
+
+### Critical Features
+1. **Expense Type Classification** - Every expense must be marked as "need" or "want"
+2. **Multi-language Support** - All text must use i18n translations (5 languages: EN, ES, FR, DE, SK)
+3. **Session Storage** - Data persists in session, not localStorage
+4. **Export/Import** - Full data export with backward compatibility
+5. **Savings Strategy Comparison** - Shows actual vs recommended spending allocation
+
+### Key Pages
+- `/` - Dashboard with financial overview
+- `/financial-input` - Add/edit incomes, expenses, debts
+- `/savings-strategies` - Select strategy and view comparison
+- `/charts` - Analytics and visualizations
+- `/investment` - Investment planning calculator
+
+---
+
+# Framework Documentation (Fusion Starter)
+
+While the starter comes with an Express server, only create endpoints when strictly necessary, for example to encapsulate logic that must live on the server, such as private keys handling, or certain DB operations...
 
 ## Tech Stack
 
@@ -162,3 +192,202 @@ const data: MyRouteResponse = await response.json();
 - Production-ready with multiple deployment options
 - Comprehensive UI component library included
 - Type-safe API communication via shared interfaces
+
+---
+
+# Finance App Patterns & Workflows
+
+## Translation Workflow
+
+**REQUIRED:** All user-facing text must use i18n.
+
+```typescript
+// ✅ Correct
+const { t } = useTranslation();
+<h1>{t('savings_strategies.title')}</h1>
+
+// ❌ Wrong
+<h1>Savings Strategies</h1>
+```
+
+**Adding New Translations:**
+1. Add to all 5 files: `en.json`, `es.json`, `fr.json`, `de.json`, `sk.json`
+2. Use dot notation: `section.subsection.key`
+3. Support interpolation: `{{variable}}`
+
+## Data Persistence Pattern
+
+```typescript
+// Data flows:
+// 1. User action → Context function → State update
+// 2. State update → useEffect → sessionStorage
+// 3. Page load → useEffect → sessionStorage → State
+
+// Example: Adding expense
+const { addExpense } = useFinance();
+
+addExpense({
+  name: "Groceries",
+  amount: 150,
+  category: "food",
+  frequency: "monthly",
+  type: "need"  // ⚠️ REQUIRED
+});
+```
+
+## Expense Type Classification
+
+**Every expense MUST have a type:**
+- **"need"** - Essential (housing, utilities, food, healthcare, min debt payments)
+- **"want"** - Non-essential (entertainment, dining out, hobbies)
+
+This powers the strategy comparison feature.
+
+## Currency Conversion Pattern
+
+Always convert to monthly for calculations:
+
+```typescript
+const convertToMonthly = (amount: number, frequency: string): number => {
+  switch (frequency) {
+    case "annual": return amount / 12;
+    case "weekly": return amount * 52 / 12;
+    case "biweekly": return amount * 26 / 12;
+    default: return amount;
+  }
+};
+
+// Usage
+const totalMonthlyExpenses = expenses.reduce(
+  (sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency),
+  0
+);
+```
+
+## Strategy Comparison Logic
+
+```typescript
+// 1. Calculate actual spending by type
+const actualNeeds = expenses
+  .filter(e => e.type === "need")
+  .reduce((sum, e) => sum + convertToMonthly(e.amount, e.frequency), 0);
+
+const actualWants = expenses
+  .filter(e => e.type === "want")
+  .reduce((sum, e) => sum + convertToMonthly(e.amount, e.frequency), 0);
+
+const actualSavings = totalIncome - totalExpenses;
+
+// 2. Calculate percentages
+const actualNeedsPercent = (actualNeeds / totalIncome) * 100;
+const actualWantsPercent = (actualWants / totalIncome) * 100;
+const actualSavingsPercent = (actualSavings / totalIncome) * 100;
+
+// 3. Compare with recommended strategy
+const difference = actualNeedsPercent - strategy.breakdown.needs;
+```
+
+## Form State Pattern
+
+```typescript
+// Expense form state with all required fields
+const [expenseForm, setExpenseForm] = useState({
+  name: "",
+  amount: "",
+  category: "other",
+  frequency: "monthly",
+  type: "need"  // Default value
+});
+
+// Handle submission
+const handleAddExpense = () => {
+  const amount = parseFloat(expenseForm.amount);
+  if (!expenseForm.name || !amount || amount <= 0) return;
+
+  addExpense({
+    name: expenseForm.name,
+    amount: amount,
+    category: expenseForm.category as any,
+    frequency: expenseForm.frequency as any,
+    type: expenseForm.type as any  // ⚠️ Include type
+  });
+
+  // Reset form
+  setExpenseForm({
+    name: "",
+    amount: "",
+    category: "other",
+    frequency: "monthly",
+    type: "need"
+  });
+};
+```
+
+## Export/Import Pattern
+
+**Export includes:**
+- All incomes, expenses (with type), debts
+- Selected strategy and custom strategy settings
+- Language preference
+
+**Import handles backward compatibility:**
+- Old exports without `type` field default to "need"
+- Missing strategy settings use defaults
+
+```typescript
+// Export
+const jsonData = exportData();  // Returns JSON string
+// Download or save
+
+// Import
+const success = importData(jsonString);
+if (success) {
+  // Data loaded, auto-migrated if old format
+} else {
+  // Invalid format
+}
+```
+
+## Styling Patterns
+
+```typescript
+// Color coding by category
+<span className={cn(
+  "badge",
+  expense.type === 'need' && 'bg-primary/10 text-primary',
+  expense.type === 'want' && 'bg-warning/10 text-warning'
+)}>
+  {t(`expense_type.${expense.type}`)}
+</span>
+
+// Strategy colors
+// Primary (blue) = Needs
+// Warning (orange) = Wants
+// Success (green) = Savings
+```
+
+## Common Gotchas
+
+1. **Missing expense type** - Always include `type: "need" | "want"`
+2. **String to number** - Input values are strings, always parse
+3. **Translation keys** - Must exist in ALL 5 locale files
+4. **Session storage** - Data lost on tab close, use export for persistence
+5. **Frequency conversion** - Always convert to monthly for comparison
+6. **Backward compatibility** - Old imports may lack new fields
+
+## Quick Command Reference
+
+```bash
+pnpm dev          # Start dev server
+pnpm build        # Build for production
+pnpm typecheck    # Check TypeScript
+pnpm test         # Run tests
+```
+
+## File Locations Quick Reference
+
+- **Translations:** `client/locales/*.json`
+- **Types:** `client/types/finance.ts`
+- **Context:** `client/context/FinanceContext.tsx`
+- **Pages:** `client/pages/*.tsx`
+- **UI Components:** `client/components/ui/*.tsx`

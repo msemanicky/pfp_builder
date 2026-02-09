@@ -11,6 +11,7 @@ export interface Expense {
   amount: number;
   category: "housing" | "food" | "transportation" | "utilities" | "entertainment" | "healthcare" | "education" | "insurance" | "debt" | "other";
   frequency: "monthly" | "annual" | "weekly" | "biweekly";
+  type: "need" | "want" | "savings";
 }
 
 export interface Debt {
