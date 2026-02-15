@@ -93,15 +93,15 @@ const ChartsAnalytics: React.FC = () => {
           value: totalMonthlyDebtPayment,
         },
         {
-          name: "Needs",
+          name: t('charts.needs'),
           value: (totalMonthlyIncome * selectedBreakdown.needs) / 100,
         },
         {
-          name: "Wants",
+          name: t('charts.wants'),
           value: (totalMonthlyIncome * selectedBreakdown.wants) / 100,
         },
         {
-          name: "Savings",
+          name: t('charts.savings'),
           value: Math.max(0, strategyMonthlySavings),
         },
       ]
@@ -126,7 +126,7 @@ const ChartsAnalytics: React.FC = () => {
 
   // Short-term savings projection (3 months)
   const shortTermData = Array.from({ length: 3 }, (_, i) => ({
-    month: `Month ${i + 1}`,
+    month: t('charts.month_number', { number: i + 1 }),
     savings: projectedMonthlySavings * (i + 1),
     cumulative: projectedMonthlySavings * (i + 1),
   }));
@@ -181,7 +181,7 @@ const ChartsAnalytics: React.FC = () => {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Add your financial information to see charts and analytics.
+              {t('charts.no_data_description')}
             </p>
           </CardContent>
         </Card>
@@ -201,7 +201,7 @@ const ChartsAnalytics: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle>{t('charts.income_vs_expenses')}</CardTitle>
-            <CardDescription>Monthly breakdown</CardDescription>
+            <CardDescription>{t('charts.income_vs_expenses_desc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -223,7 +223,7 @@ const ChartsAnalytics: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle>{t('charts.monthly_breakdown')}</CardTitle>
-            <CardDescription>Proportion of income allocation</CardDescription>
+            <CardDescription>{t('charts.monthly_breakdown_desc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -254,7 +254,7 @@ const ChartsAnalytics: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle>{t('charts.short_term_savings')}</CardTitle>
-            <CardDescription>Next 3 months projection</CardDescription>
+            <CardDescription>{t('charts.short_term_projection_desc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -264,7 +264,7 @@ const ChartsAnalytics: React.FC = () => {
                 <YAxis />
                 <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
                 <Legend />
-                <Line type="monotone" dataKey="cumulative" stroke="#0F7173" strokeWidth={2} name="Cumulative Savings" />
+                <Line type="monotone" dataKey="cumulative" stroke="#0F7173" strokeWidth={2} name={t('charts.cumulative_savings')} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -274,7 +274,7 @@ const ChartsAnalytics: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle>{t('charts.long_term_savings')}</CardTitle>
-            <CardDescription>Next 12 months projection (with inflation adjustment)</CardDescription>
+            <CardDescription>{t('charts.long_term_projection_desc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -284,8 +284,8 @@ const ChartsAnalytics: React.FC = () => {
                 <YAxis />
                 <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
                 <Legend />
-                <Line type="monotone" dataKey="cumulative" stroke="#0F7173" strokeWidth={2} name="Nominal Value" />
-                <Line type="monotone" dataKey="realValue" stroke="#FFD700" strokeWidth={2} name="Real Value (Inflation Adjusted)" strokeDasharray="5 5" />
+                <Line type="monotone" dataKey="cumulative" stroke="#0F7173" strokeWidth={2} name={t('charts.nominal_value')} />
+                <Line type="monotone" dataKey="realValue" stroke="#FFD700" strokeWidth={2} name={t('charts.real_value_inflation')} strokeDasharray="5 5" />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -298,7 +298,7 @@ const ChartsAnalytics: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle>{t('charts.debt_payoff')}</CardTitle>
-              <CardDescription>Months remaining for each debt</CardDescription>
+              <CardDescription>{t('charts.debt_payoff_desc')}</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -308,7 +308,7 @@ const ChartsAnalytics: React.FC = () => {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="remaining" fill="#FFD700" name="Months Remaining" />
+                  <Bar dataKey="remaining" fill="#FFD700" name={t('charts.months_remaining')} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -320,7 +320,7 @@ const ChartsAnalytics: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle>{t('charts.expense_breakdown')}</CardTitle>
-            <CardDescription>Monthly expenses by category</CardDescription>
+            <CardDescription>{t('charts.expense_breakdown_desc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={400}>

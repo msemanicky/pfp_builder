@@ -50,7 +50,7 @@ const Index: React.FC = () => {
             </p>
             <Link to="/financial-input">
               <Button size="lg" className="w-full">
-                Add Income
+                {t('home.add_income_button')}
               </Button>
             </Link>
           </div>
@@ -70,7 +70,7 @@ const Index: React.FC = () => {
                 <p className="text-2xl font-bold text-foreground">
                   ${totalMonthlyIncome.toFixed(2)}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">Per month</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('home.per_month')}</p>
               </CardContent>
             </Card>
 
@@ -85,7 +85,7 @@ const Index: React.FC = () => {
                 <p className="text-2xl font-bold text-foreground">
                   ${totalMonthlyExpenses.toFixed(2)}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">Per month</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('home.per_month')}</p>
               </CardContent>
             </Card>
 
@@ -100,7 +100,7 @@ const Index: React.FC = () => {
                 <p className={`text-2xl font-bold ${availableSavings >= 0 ? 'text-success' : 'text-destructive'}`}>
                   ${Math.abs(availableSavings).toFixed(2)}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">After expenses</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('home.after_expenses')}</p>
               </CardContent>
             </Card>
 
@@ -114,7 +114,7 @@ const Index: React.FC = () => {
                 <p className="text-2xl font-bold text-primary">
                   {savingsRate.toFixed(1)}%
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">Of income</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('home.of_income')}</p>
               </CardContent>
             </Card>
           </div>
@@ -157,7 +157,7 @@ const Index: React.FC = () => {
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Monthly Summary</p>
+                  <p className="text-sm text-muted-foreground mb-1">{t('home.monthly_summary')}</p>
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-sm">{t('home.total_income')}</span>

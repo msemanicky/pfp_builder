@@ -81,7 +81,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const handleClear = () => {
     if (
-      window.confirm("This will clear all your financial data. Are you sure?")
+      window.confirm(t('layout.confirm_clear'))
     ) {
       clearData();
     }
@@ -111,10 +111,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               </div>
               <div className="hidden sm:flex flex-col">
                 <h1 className="text-lg font-bold text-foreground">
-                  Personal Finance Planner
+                  {t('app.title')}
                 </h1>
                 <p className="text-xs text-muted-foreground">
-                  Plan your finances with confidence
+                  {t('app.subtitle')}
                 </p>
               </div>
             </Link>
@@ -140,7 +140,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               {/* Language Selector */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" title="Change Language">
+                  <Button variant="ghost" size="icon" title={t('layout.change_language_title')}>
                     <Globe className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -163,25 +163,25 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               {/* Data Actions */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" title="Export/Import">
+                  <Button variant="ghost" size="icon" title={t('layout.export_import_title')}>
                     <Download className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={handleExport}>
                     <Download className="w-4 h-4 mr-2" />
-                    Export Data
+                    {t('layout.export_data')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleImport}>
                     <Upload className="w-4 h-4 mr-2" />
-                    Import Data
+                    {t('layout.import_data')}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={handleClear}
                     className="text-destructive"
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    Clear Data
+                    {t('layout.clear_data')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -240,7 +240,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
             <div>
               <h4 className="font-semibold mb-4 text-foreground">
-                Quick Links
+                {t('layout.quick_links')}
               </h4>
               <ul className="space-y-2 text-sm">
                 {navItems.map((item) => (
@@ -256,14 +256,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-foreground">Resources</h4>
+              <h4 className="font-semibold mb-4 text-foreground">{t('layout.resources')}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
                   <a
                     href="#"
                     className="hover:text-foreground transition-colors"
                   >
-                    Privacy Policy
+                    {t('layout.privacy_policy')}
                   </a>
                 </li>
                 <li>
@@ -271,7 +271,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     href="#"
                     className="hover:text-foreground transition-colors"
                   >
-                    Terms of Service
+                    {t('layout.terms_of_service')}
                   </a>
                 </li>
                 <li>
@@ -279,7 +279,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     href="#"
                     className="hover:text-foreground transition-colors"
                   >
-                    Contact Us
+                    {t('layout.contact_us')}
                   </a>
                 </li>
               </ul>
@@ -287,8 +287,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
           <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
             <p>
-              &copy; {new Date().getFullYear()} Personal Finance Planner. All
-              rights reserved.
+              &copy; {new Date().getFullYear()} {t('layout.copyright')}
             </p>
           </div>
         </div>

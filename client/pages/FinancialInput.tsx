@@ -170,7 +170,7 @@ const FinancialInput: React.FC = () => {
                   <Input
                     value={incomeForm.name}
                     onChange={(e) => setIncomeForm({ ...incomeForm, name: e.target.value })}
-                    placeholder="e.g. Salary"
+                    placeholder={t('financial_input.placeholder_income')}
                   />
                 </div>
                 <div>
@@ -221,7 +221,7 @@ const FinancialInput: React.FC = () => {
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle>{t('financial_input.incomes')}</CardTitle>
-                <CardDescription>Total: {data.incomes.length} income source(s)</CardDescription>
+                <CardDescription>{t('financial_input.total_income_sources', { count: data.incomes.length })}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -252,7 +252,7 @@ const FinancialInput: React.FC = () => {
                     </div>
                   ))}
                   {data.incomes.length === 0 && (
-                    <p className="text-center text-muted-foreground py-8">No incomes added yet</p>
+                    <p className="text-center text-muted-foreground py-8">{t('financial_input.no_incomes')}</p>
                   )}
                 </div>
               </CardContent>
@@ -273,7 +273,7 @@ const FinancialInput: React.FC = () => {
                   <Input
                     value={expenseForm.name}
                     onChange={(e) => setExpenseForm({ ...expenseForm, name: e.target.value })}
-                    placeholder="e.g. Rent"
+                    placeholder={t('financial_input.placeholder_expense')}
                   />
                 </div>
                 <div>
@@ -375,7 +375,7 @@ const FinancialInput: React.FC = () => {
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle>{t('financial_input.expenses')}</CardTitle>
-                <CardDescription>Total: {data.expenses.length} expense(s)</CardDescription>
+                <CardDescription>{t('financial_input.total_expenses_count', { count: data.expenses.length })}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -417,7 +417,7 @@ const FinancialInput: React.FC = () => {
                     </div>
                   ))}
                   {data.expenses.length === 0 && (
-                    <p className="text-center text-muted-foreground py-8">No expenses added yet</p>
+                    <p className="text-center text-muted-foreground py-8">{t('financial_input.no_expenses')}</p>
                   )}
                 </div>
               </CardContent>
@@ -438,11 +438,11 @@ const FinancialInput: React.FC = () => {
                   <Input
                     value={debtForm.name}
                     onChange={(e) => setDebtForm({ ...debtForm, name: e.target.value })}
-                    placeholder="e.g. Student Loan"
+                    placeholder={t('financial_input.placeholder_debt')}
                   />
                 </div>
                 <div>
-                  <Label>Principal Amount</Label>
+                  <Label>{t('financial_input.principal_amount')}</Label>
                   <Input
                     type="number"
                     value={debtForm.principal}
@@ -505,7 +505,7 @@ const FinancialInput: React.FC = () => {
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle>{t('financial_input.debts')}</CardTitle>
-                <CardDescription>Total: {data.debts.length} debt(s)</CardDescription>
+                <CardDescription>{t('financial_input.total_debts_count', { count: data.debts.length })}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -514,7 +514,7 @@ const FinancialInput: React.FC = () => {
                       <div className="flex-1">
                         <p className="font-medium text-foreground">{debt.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          Principal: ${debt.principal.toFixed(2)} • Payment: ${debt.monthlyPayment.toFixed(2)}/mo
+                          {t('financial_input.debt_principal')} ${debt.principal.toFixed(2)} • {t('financial_input.debt_payment')} ${debt.monthlyPayment.toFixed(2)}{t('financial_input.per_month_short')}
                         </p>
                       </div>
                       <div className="flex gap-2">
@@ -536,7 +536,7 @@ const FinancialInput: React.FC = () => {
                     </div>
                   ))}
                   {data.debts.length === 0 && (
-                    <p className="text-center text-muted-foreground py-8">No debts added yet</p>
+                    <p className="text-center text-muted-foreground py-8">{t('financial_input.no_debts')}</p>
                   )}
                 </div>
               </CardContent>
