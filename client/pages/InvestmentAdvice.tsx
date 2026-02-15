@@ -59,16 +59,33 @@ const InvestmentAdvice: React.FC = () => {
     : monthlyAvailableSavings;
 
   // Compound Interest Calculator State
-  const [calculator, setCalculator] = useState({
-    initialAmount: 0,
-    monthlyContribution: Math.max(0, strategyMonthlySavings),
+  const [calculator, setCalculator] = useState<{
+    initialAmount: string | number;
+    monthlyContribution: string | number;
+    annualReturn: string | number;
+    inflationRate: string | number;
+    years: string | number;
+  }>({
+    initialAmount: "",
+    monthlyContribution: Math.max(0, strategyMonthlySavings) || "",
     annualReturn: 7,
     inflationRate: 2.5,
     years: 10,
   });
 
+  const parseNum = (val: string | number): number => {
+    const n = typeof val === 'string' ? parseFloat(val) : val;
+    return isNaN(n) ? 0 : n;
+  };
+
   // Calculate compound interest
   const compoundInterestData = useMemo(() => {
+    const initialAmount = parseNum(calculator.initialAmount);
+    const monthlyContribution = parseNum(calculator.monthlyContribution);
+    const annualReturn = parseNum(calculator.annualReturn);
+    const inflationRate = parseNum(calculator.inflationRate);
+    const years = parseNum(calculator.years);
+
     const data: Array<{
       year: number;
       total: number;
@@ -76,21 +93,20 @@ const InvestmentAdvice: React.FC = () => {
       interest: number;
       realValue: number;
     }> = [];
-    const monthlyRate = calculator.annualReturn / 100 / 12;
-    const monthlyInflation = calculator.inflationRate / 100 / 12;
-    let total = calculator.initialAmount;
+    const monthlyRate = annualReturn / 100 / 12;
+    let total = initialAmount;
 
-    for (let month = 0; month <= calculator.years * 12; month++) {
+    for (let month = 0; month <= years * 12; month++) {
       const year = Math.floor(month / 12);
-      
+
       // Only add data for year boundaries and initial
-      if (month % 12 === 0 || month === calculator.years * 12) {
-        const principalInvested = calculator.initialAmount + calculator.monthlyContribution * month;
+      if (month % 12 === 0 || month === years * 12) {
+        const principalInvested = initialAmount + monthlyContribution * month;
         const interest = Math.max(0, total - principalInvested);
         // Calculate real value (adjusted for inflation)
-        const inflationFactor = Math.pow(1 + calculator.inflationRate / 100, year);
+        const inflationFactor = Math.pow(1 + inflationRate / 100, year);
         const realValue = total / inflationFactor;
-        
+
         data.push({
           year,
           total: Math.round(total * 100) / 100,
@@ -101,7 +117,7 @@ const InvestmentAdvice: React.FC = () => {
       }
 
       // Calculate compound interest with monthly contribution
-      total = total * (1 + monthlyRate) + calculator.monthlyContribution;
+      total = total * (1 + monthlyRate) + monthlyContribution;
     }
 
     return data;
@@ -111,6 +127,7 @@ const InvestmentAdvice: React.FC = () => {
     total: 0,
     principal: 0,
     interest: 0,
+    realValue: 0,
   };
 
   const principles = [
@@ -179,8 +196,9 @@ const InvestmentAdvice: React.FC = () => {
               <Input
                 type="number"
                 value={calculator.initialAmount}
-                onChange={(e) => setCalculator({ ...calculator, initialAmount: parseFloat(e.target.value) || 0 })}
-                placeholder="0"
+                onChange={(e) => setCalculator({ ...calculator, initialAmount: e.target.value })}
+                placeholder="0.00"
+                onFocus={(e) => e.target.select()}
               />
             </div>
             <div>
@@ -188,8 +206,9 @@ const InvestmentAdvice: React.FC = () => {
               <Input
                 type="number"
                 value={calculator.monthlyContribution}
-                onChange={(e) => setCalculator({ ...calculator, monthlyContribution: parseFloat(e.target.value) || 0 })}
-                placeholder="0"
+                onChange={(e) => setCalculator({ ...calculator, monthlyContribution: e.target.value })}
+                placeholder="0.00"
+                onFocus={(e) => e.target.select()}
               />
             </div>
             <div>
@@ -197,9 +216,10 @@ const InvestmentAdvice: React.FC = () => {
               <Input
                 type="number"
                 value={calculator.annualReturn}
-                onChange={(e) => setCalculator({ ...calculator, annualReturn: parseFloat(e.target.value) || 0 })}
+                onChange={(e) => setCalculator({ ...calculator, annualReturn: e.target.value })}
                 placeholder="7"
                 step="0.1"
+                onFocus={(e) => e.target.select()}
               />
             </div>
             <div>
@@ -207,9 +227,10 @@ const InvestmentAdvice: React.FC = () => {
               <Input
                 type="number"
                 value={calculator.inflationRate}
-                onChange={(e) => setCalculator({ ...calculator, inflationRate: parseFloat(e.target.value) || 0 })}
+                onChange={(e) => setCalculator({ ...calculator, inflationRate: e.target.value })}
                 placeholder="2.5"
                 step="0.1"
+                onFocus={(e) => e.target.select()}
               />
             </div>
             <div>
@@ -217,8 +238,9 @@ const InvestmentAdvice: React.FC = () => {
               <Input
                 type="number"
                 value={calculator.years}
-                onChange={(e) => setCalculator({ ...calculator, years: parseInt(e.target.value) || 0 })}
+                onChange={(e) => setCalculator({ ...calculator, years: e.target.value })}
                 placeholder="10"
+                onFocus={(e) => e.target.select()}
               />
             </div>
           </CardContent>
@@ -235,17 +257,17 @@ const InvestmentAdvice: React.FC = () => {
                 ${finalData.total.toLocaleString("en-US", { maximumFractionDigits: 2 })}
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                {calculator.years === 1
-                  ? t("investment.after_years_singular", { years: calculator.years })
-                  : t("investment.after_years_plural", { years: calculator.years })}
+                {parseNum(calculator.years) === 1
+                  ? t("investment.after_years_singular", { years: parseNum(calculator.years) })
+                  : t("investment.after_years_plural", { years: parseNum(calculator.years) })}
               </p>
-              {calculator.inflationRate > 0 && (
+              {parseNum(calculator.inflationRate) > 0 && (
                 <>
                   <p className="text-2xl font-semibold text-success/80 mt-4">
                     ${finalData.realValue.toLocaleString("en-US", { maximumFractionDigits: 2 })}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {t("investment.real_value", { rate: calculator.inflationRate })}
+                    {t("investment.real_value", { rate: parseNum(calculator.inflationRate) })}
                   </p>
                 </>
               )}
