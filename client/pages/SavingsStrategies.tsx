@@ -3,9 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useFinance } from "@/context/FinanceContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { CheckCircle2, Info } from "lucide-react";
+import InteractiveSplitBar from "@/components/InteractiveSplitBar";
 
 const strategies = [
   {
@@ -100,7 +99,6 @@ const SavingsStrategies: React.FC = () => {
   const actualWantsPercent = totalMonthlyIncome > 0 ? (actualWantsExpenses / totalMonthlyIncome) * 100 : 0;
   const actualSavingsPercent = totalMonthlyIncome > 0 ? (actualSavings / totalMonthlyIncome) * 100 : 0;
 
-  const totalCustomPercent = customBreakdown.needs + customBreakdown.wants + customBreakdown.savings;
   const selectedStrategyData = strategies.find((strategy) => strategy.id === data.selectedStrategy);
   const selectedStrategyName = data.selectedStrategy === "custom"
     ? t("savings_strategies.custom.title")
@@ -301,89 +299,18 @@ const SavingsStrategies: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Custom Input Fields */}
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs">{t("savings_strategies.custom.needs_label")}</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={customBreakdown.needs}
-                      onChange={(e) => {
-                        const needs = parseInt(e.target.value) || 0;
-                        setCustomBreakdown({ ...customBreakdown, needs });
-                      }}
-                      className="h-8"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">{t("savings_strategies.custom.wants_label")}</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={customBreakdown.wants}
-                      onChange={(e) => {
-                        const wants = parseInt(e.target.value) || 0;
-                        setCustomBreakdown({ ...customBreakdown, wants });
-                      }}
-                      className="h-8"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">{t("savings_strategies.custom.savings_label")}</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={customBreakdown.savings}
-                      onChange={(e) => {
-                        const savings = parseInt(e.target.value) || 0;
-                        setCustomBreakdown({ ...customBreakdown, savings });
-                      }}
-                      className="h-8"
-                    />
-                  </div>
-                  
-                  {/* Total Validation */}
-                  <div className="text-xs">
-                    <span className={`font-medium ${
-                      totalCustomPercent === 100
-                        ? "text-success"
-                        : "text-destructive"
-                    }`}>
-                      {t("savings_strategies.custom.total_label", { total: totalCustomPercent })}
-                    </span>
-                    {totalCustomPercent !== 100 && (
-                      <span className="text-muted-foreground ml-2">{t("savings_strategies.custom.total_hint")}</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Breakdown Visualization */}
-                <div className="space-y-2">
-                  <div className="flex gap-2 h-8 rounded-lg overflow-hidden bg-muted">
-                    <div
-                      className="bg-primary flex items-center justify-center text-xs font-semibold text-primary-foreground"
-                      style={{ width: `${customBreakdown.needs}%` }}
-                    >
-                      {customBreakdown.needs > 15 && `${customBreakdown.needs}%`}
-                    </div>
-                    <div
-                      className="bg-warning flex items-center justify-center text-xs font-semibold text-warning-foreground"
-                      style={{ width: `${customBreakdown.wants}%` }}
-                    >
-                      {customBreakdown.wants > 15 && `${customBreakdown.wants}%`}
-                    </div>
-                    <div
-                      className="bg-success flex items-center justify-center text-xs font-semibold text-success-foreground"
-                      style={{ width: `${customBreakdown.savings}%` }}
-                    >
-                      {customBreakdown.savings > 15 && `${customBreakdown.savings}%`}
-                    </div>
-                  </div>
-                </div>
+                {/* Interactive Split Bar */}
+                <InteractiveSplitBar
+                  needs={customBreakdown.needs}
+                  wants={customBreakdown.wants}
+                  savings={customBreakdown.savings}
+                  onChange={(values) => setCustomBreakdown(values)}
+                  labels={{
+                    needs: t("savings_strategies.needs"),
+                    wants: t("savings_strategies.wants"),
+                    savings: t("savings_strategies.savings"),
+                  }}
+                />
 
                 {/* Dollar Amounts */}
                 {totalMonthlyIncome > 0 && (
@@ -421,14 +348,11 @@ const SavingsStrategies: React.FC = () => {
                 {/* Apply Button */}
                 <Button
                   onClick={() => {
-                    if (totalCustomPercent === 100) {
-                      setCustomStrategy(customBreakdown);
-                      setSelectedStrategy("custom");
-                    }
+                    setCustomStrategy(customBreakdown);
+                    setSelectedStrategy("custom");
                   }}
                   variant={data.selectedStrategy === "custom" ? "default" : "outline"}
                   className="w-full"
-                  disabled={totalCustomPercent !== 100}
                 >
                   {data.selectedStrategy === "custom"
                     ? t("savings_strategies.selected_button")
