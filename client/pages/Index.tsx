@@ -5,29 +5,23 @@ import { useFinance } from "@/context/FinanceContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowUpRight, ArrowDownLeft, PieChart, TrendingUp } from "lucide-react";
-
-const convertToMonthly = (amount: number, frequency: string): number => {
-  switch (frequency) {
-    case "annual":
-      return amount / 12;
-    case "weekly":
-      return amount * 52 / 12;
-    case "biweekly":
-      return amount * 26 / 12;
-    default:
-      return amount;
-  }
-};
+import {
+  calculateTotalMonthlyIncome,
+  calculateTotalMonthlyExpenses,
+  calculateTotalMonthlyDebtPayment,
+  calculateAvailableSavings,
+  calculateSavingsRate,
+} from "@/lib/financial-utils";
 
 const Index: React.FC = () => {
   const { t } = useTranslation();
   const { data } = useFinance();
 
-  const totalMonthlyIncome = data.incomes.reduce((sum, income) => sum + convertToMonthly(income.amount, income.frequency), 0);
-  const totalMonthlyExpenses = data.expenses.reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
-  const totalMonthlyDebtPayment = data.debts.reduce((sum, debt) => sum + debt.monthlyPayment, 0);
-  const availableSavings = totalMonthlyIncome - totalMonthlyExpenses - totalMonthlyDebtPayment;
-  const savingsRate = totalMonthlyIncome > 0 ? (availableSavings / totalMonthlyIncome) * 100 : 0;
+  const totalMonthlyIncome = calculateTotalMonthlyIncome(data.incomes);
+  const totalMonthlyExpenses = calculateTotalMonthlyExpenses(data.expenses);
+  const totalMonthlyDebtPayment = calculateTotalMonthlyDebtPayment(data.debts);
+  const availableSavings = calculateAvailableSavings(totalMonthlyIncome, totalMonthlyExpenses, totalMonthlyDebtPayment);
+  const savingsRate = calculateSavingsRate(availableSavings, totalMonthlyIncome);
 
   const hasData = data.incomes.length > 0 || data.expenses.length > 0 || data.debts.length > 0;
 

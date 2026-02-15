@@ -1,5 +1,6 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { normalizeSplit, calculateSplitFromDivider, calculateSplitFromKeyboard } from "@/lib/split-bar-utils";
 
 interface InteractiveSplitBarProps {
   needs: number;
@@ -31,12 +32,7 @@ const InteractiveSplitBar: React.FC<InteractiveSplitBarProps> = ({
   useEffect(() => {
     const total = needs + wants + savings;
     if (total !== 100 && total > 0) {
-      const factor = 100 / total;
-      onChange({
-        needs: Math.round(needs * factor),
-        wants: Math.round(wants * factor),
-        savings: Math.round(savings * factor),
-      });
+      onChange(normalizeSplit(needs, wants, savings));
     }
   }, []);
 
@@ -48,19 +44,7 @@ const InteractiveSplitBar: React.FC<InteractiveSplitBarProps> = ({
       const cursorX = clientX - rect.left;
       const percent = Math.round((cursorX / rect.width) * 100);
 
-      if (divider === "divider1") {
-        // Divider between Needs and Wants (Savings stays fixed)
-        const clampedNeeds = Math.max(1, Math.min(100 - savings - 1, percent));
-        const newNeeds = clampedNeeds;
-        const newWants = 100 - newNeeds - savings;
-        onChange({ needs: newNeeds, wants: newWants, savings });
-      } else {
-        // Divider between Wants and Savings (Needs stays fixed)
-        const clampedPercent = Math.max(needs + 1, Math.min(99, percent));
-        const newSavings = 100 - clampedPercent;
-        const newWants = 100 - needs - newSavings;
-        onChange({ needs, wants: newWants, savings: newSavings });
-      }
+      onChange(calculateSplitFromDivider(percent, divider, { needs, wants, savings }));
     },
     [needs, wants, savings, onChange]
   );
@@ -121,18 +105,7 @@ const InteractiveSplitBar: React.FC<InteractiveSplitBarProps> = ({
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         event.preventDefault();
         const delta = event.key === "ArrowLeft" ? -1 : 1;
-
-        if (divider === "divider1") {
-          const newNeeds = Math.max(1, Math.min(100 - savings - 1, needs + delta));
-          const newWants = 100 - newNeeds - savings;
-          onChange({ needs: newNeeds, wants: newWants, savings });
-        } else {
-          const currentDividerPos = needs + wants;
-          const newDividerPos = Math.max(needs + 1, Math.min(99, currentDividerPos + delta));
-          const newSavings = 100 - newDividerPos;
-          const newWants = 100 - needs - newSavings;
-          onChange({ needs, wants: newWants, savings: newSavings });
-        }
+        onChange(calculateSplitFromKeyboard(delta, divider, { needs, wants, savings }));
       }
     },
     [needs, wants, savings, onChange]

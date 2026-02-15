@@ -17,44 +17,30 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-
-const convertToMonthly = (amount: number, frequency: string): number => {
-  switch (frequency) {
-    case "annual":
-      return amount / 12;
-    case "weekly":
-      return amount * 52 / 12;
-    case "biweekly":
-      return amount * 26 / 12;
-    default:
-      return amount;
-  }
-};
+import {
+  calculateTotalMonthlyIncome,
+  calculateTotalMonthlyExpenses,
+  calculateTotalMonthlyDebtPayment,
+} from "@/lib/financial-utils";
+import { groupExpensesByCategory } from "@/lib/charts-utils";
+import { STRATEGY_BREAKDOWN } from "@/lib/strategy-definitions";
 
 const COLORS = ["#0F7173", "#F4A460", "#FFD700", "#90EE90", "#FF6B6B", "#4ECDC4", "#95E1D3"];
-
-const STRATEGY_BREAKDOWN: Record<string, { needs: number; wants: number; savings: number }> = {
-  "50_30_20": { needs: 50, wants: 30, savings: 20 },
-  pay_yourself_first: { needs: 70, wants: 10, savings: 20 },
-  aggressive_saving: { needs: 40, wants: 20, savings: 40 },
-  balanced: { needs: 40, wants: 30, savings: 30 },
-  debt_payoff: { needs: 55, wants: 35, savings: 10 },
-};
 
 const ChartsAnalytics: React.FC = () => {
   const { t } = useTranslation();
   const { data } = useFinance();
 
   const totalMonthlyIncome = useMemo(() => {
-    return data.incomes.reduce((sum, income) => sum + convertToMonthly(income.amount, income.frequency), 0);
+    return calculateTotalMonthlyIncome(data.incomes);
   }, [data.incomes]);
 
   const totalMonthlyExpenses = useMemo(() => {
-    return data.expenses.reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
+    return calculateTotalMonthlyExpenses(data.expenses);
   }, [data.expenses]);
 
   const totalMonthlyDebtPayment = useMemo(() => {
-    return data.debts.reduce((sum, debt) => sum + debt.monthlyPayment, 0);
+    return calculateTotalMonthlyDebtPayment(data.debts);
   }, [data.debts]);
 
   const monthlyAvailableSavings = totalMonthlyIncome - totalMonthlyExpenses - totalMonthlyDebtPayment;
@@ -154,16 +140,7 @@ const ChartsAnalytics: React.FC = () => {
   }));
 
   // Expense breakdown by category
-  const expenseByCategory = data.expenses.reduce((acc, expense) => {
-    const monthly = convertToMonthly(expense.amount, expense.frequency);
-    const existing = acc.find((e) => e.category === expense.category);
-    if (existing) {
-      existing.value += monthly;
-    } else {
-      acc.push({ category: expense.category, value: monthly });
-    }
-    return acc;
-  }, [] as Array<{ category: string; value: number }>);
+  const expenseByCategory = groupExpensesByCategory(data.expenses);
 
   const hasData = data.incomes.length > 0;
 

@@ -5,101 +5,31 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, Info } from "lucide-react";
 import InteractiveSplitBar from "@/components/InteractiveSplitBar";
-
-const strategies = [
-  {
-    id: "50_30_20",
-    nameKey: "strategy.50_30_20.name",
-    descriptionKey: "strategy.50_30_20.description",
-    breakdown: {
-      needs: 50,
-      wants: 30,
-      savings: 20,
-    },
-  },
-  {
-    id: "pay_yourself_first",
-    nameKey: "strategy.pay_yourself_first.name",
-    descriptionKey: "strategy.pay_yourself_first.description",
-    breakdown: {
-      needs: 70,
-      wants: 10,
-      savings: 20,
-    },
-  },
-  {
-    id: "aggressive_saving",
-    nameKey: "strategy.aggressive_saving.name",
-    descriptionKey: "strategy.aggressive_saving.description",
-    breakdown: {
-      needs: 40,
-      wants: 20,
-      savings: 40,
-    },
-  },
-  {
-    id: "balanced",
-    nameKey: "strategy.balanced.name",
-    descriptionKey: "strategy.balanced.description",
-    breakdown: {
-      needs: 40,
-      wants: 30,
-      savings: 30,
-    },
-  },
-  {
-    id: "debt_payoff",
-    nameKey: "strategy.debt_payoff.name",
-    descriptionKey: "strategy.debt_payoff.description",
-    breakdown: {
-      needs: 55,
-      wants: 35,
-      savings: 10,
-    },
-  },
-];
-
-const convertToMonthly = (amount: number, frequency: string): number => {
-  switch (frequency) {
-    case "annual":
-      return amount / 12;
-    case "weekly":
-      return amount * 52 / 12;
-    case "biweekly":
-      return amount * 26 / 12;
-    default:
-      return amount;
-  }
-};
+import {
+  calculateTotalMonthlyIncome,
+  calculateTotalMonthlyExpenses,
+  calculateActualAllocation,
+} from "@/lib/financial-utils";
+import { STRATEGIES } from "@/lib/strategy-definitions";
 
 const SavingsStrategies: React.FC = () => {
   const { t } = useTranslation();
   const { data, setSelectedStrategy, setCustomStrategy } = useFinance();
-  
+
   const [customBreakdown, setCustomBreakdown] = useState(data.customStrategy);
 
-  const totalMonthlyIncome = data.incomes.reduce((sum, income) => sum + convertToMonthly(income.amount, income.frequency), 0);
-  const totalMonthlyExpenses = data.expenses.reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
+  const totalMonthlyIncome = calculateTotalMonthlyIncome(data.incomes);
+  const totalMonthlyExpenses = calculateTotalMonthlyExpenses(data.expenses);
 
-  // Calculate actual allocation based on categorized expenses
-  const actualNeedsExpenses = data.expenses
-    .filter(expense => expense.type === "need")
-    .reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
-  const actualWantsExpenses = data.expenses
-    .filter(expense => expense.type === "want")
-    .reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
-  const actualSavingsExpenses = data.expenses
-    .filter(expense => expense.type === "savings")
-    .reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
-  // Actual savings includes both savings-type expenses and leftover income
-  const actualSavings = actualSavingsExpenses + (totalMonthlyIncome - totalMonthlyExpenses);
+  const allocation = calculateActualAllocation(data.expenses, totalMonthlyIncome, totalMonthlyExpenses);
+  const actualNeedsExpenses = allocation.needsAmount;
+  const actualWantsExpenses = allocation.wantsAmount;
+  const actualSavings = allocation.actualSavings;
+  const actualNeedsPercent = allocation.needsPercent;
+  const actualWantsPercent = allocation.wantsPercent;
+  const actualSavingsPercent = allocation.savingsPercent;
 
-  // Calculate actual percentages
-  const actualNeedsPercent = totalMonthlyIncome > 0 ? (actualNeedsExpenses / totalMonthlyIncome) * 100 : 0;
-  const actualWantsPercent = totalMonthlyIncome > 0 ? (actualWantsExpenses / totalMonthlyIncome) * 100 : 0;
-  const actualSavingsPercent = totalMonthlyIncome > 0 ? (actualSavings / totalMonthlyIncome) * 100 : 0;
-
-  const selectedStrategyData = strategies.find((strategy) => strategy.id === data.selectedStrategy);
+  const selectedStrategyData = STRATEGIES.find((strategy) => strategy.id === data.selectedStrategy);
   const selectedStrategyName = data.selectedStrategy === "custom"
     ? t("savings_strategies.custom.title")
     : selectedStrategyData
@@ -174,7 +104,7 @@ const SavingsStrategies: React.FC = () => {
         <div className="space-y-6">
           {/* Strategy Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {strategies.map((strategy) => (
+            {STRATEGIES.map((strategy) => (
               <Card
                 key={strategy.id}
                 className={`cursor-pointer transition-all hover:shadow-lg ${

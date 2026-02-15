@@ -18,36 +18,23 @@ import {
   Bar,
 } from "recharts";
 import { TrendingUp, Award, Zap, Shield, DollarSign } from "lucide-react";
-
-const STRATEGY_SAVINGS_PERCENT: Record<string, number> = {
-  "50_30_20": 20,
-  pay_yourself_first: 20,
-  aggressive_saving: 40,
-  balanced: 30,
-  debt_payoff: 10,
-};
-
-const convertToMonthly = (amount: number, frequency: string): number => {
-  switch (frequency) {
-    case "annual":
-      return amount / 12;
-    case "weekly":
-      return amount * 52 / 12;
-    case "biweekly":
-      return amount * 26 / 12;
-    default:
-      return amount;
-  }
-};
+import {
+  calculateTotalMonthlyIncome,
+  calculateTotalMonthlyExpenses,
+  calculateTotalMonthlyDebtPayment,
+  parseNum,
+} from "@/lib/financial-utils";
+import { calculateCompoundInterest, calculateROI } from "@/lib/investment-utils";
+import { STRATEGY_SAVINGS_PERCENT } from "@/lib/strategy-definitions";
 
 const InvestmentAdvice: React.FC = () => {
   const { t } = useTranslation();
   const { data } = useFinance();
 
   // Get available savings
-  const totalMonthlyIncome = data.incomes.reduce((sum, income) => sum + convertToMonthly(income.amount, income.frequency), 0);
-  const totalMonthlyExpenses = data.expenses.reduce((sum, expense) => sum + convertToMonthly(expense.amount, expense.frequency), 0);
-  const totalMonthlyDebtPayment = data.debts.reduce((sum, debt) => sum + debt.monthlyPayment, 0);
+  const totalMonthlyIncome = calculateTotalMonthlyIncome(data.incomes);
+  const totalMonthlyExpenses = calculateTotalMonthlyExpenses(data.expenses);
+  const totalMonthlyDebtPayment = calculateTotalMonthlyDebtPayment(data.debts);
   const monthlyAvailableSavings = totalMonthlyIncome - totalMonthlyExpenses - totalMonthlyDebtPayment;
   const selectedSavingsPercent = data.selectedStrategy === "custom"
     ? data.customStrategy.savings
@@ -73,54 +60,15 @@ const InvestmentAdvice: React.FC = () => {
     years: 10,
   });
 
-  const parseNum = (val: string | number): number => {
-    const n = typeof val === 'string' ? parseFloat(val) : val;
-    return isNaN(n) ? 0 : n;
-  };
-
   // Calculate compound interest
   const compoundInterestData = useMemo(() => {
-    const initialAmount = parseNum(calculator.initialAmount);
-    const monthlyContribution = parseNum(calculator.monthlyContribution);
-    const annualReturn = parseNum(calculator.annualReturn);
-    const inflationRate = parseNum(calculator.inflationRate);
-    const years = parseNum(calculator.years);
-
-    const data: Array<{
-      year: number;
-      total: number;
-      principal: number;
-      interest: number;
-      realValue: number;
-    }> = [];
-    const monthlyRate = annualReturn / 100 / 12;
-    let total = initialAmount;
-
-    for (let month = 0; month <= years * 12; month++) {
-      const year = Math.floor(month / 12);
-
-      // Only add data for year boundaries and initial
-      if (month % 12 === 0 || month === years * 12) {
-        const principalInvested = initialAmount + monthlyContribution * month;
-        const interest = Math.max(0, total - principalInvested);
-        // Calculate real value (adjusted for inflation)
-        const inflationFactor = Math.pow(1 + inflationRate / 100, year);
-        const realValue = total / inflationFactor;
-
-        data.push({
-          year,
-          total: Math.round(total * 100) / 100,
-          principal: Math.round(principalInvested * 100) / 100,
-          interest: Math.round(interest * 100) / 100,
-          realValue: Math.round(realValue * 100) / 100,
-        });
-      }
-
-      // Calculate compound interest with monthly contribution
-      total = total * (1 + monthlyRate) + monthlyContribution;
-    }
-
-    return data;
+    return calculateCompoundInterest({
+      initialAmount: parseNum(calculator.initialAmount),
+      monthlyContribution: parseNum(calculator.monthlyContribution),
+      annualReturn: parseNum(calculator.annualReturn),
+      inflationRate: parseNum(calculator.inflationRate),
+      years: parseNum(calculator.years),
+    });
   }, [calculator.initialAmount, calculator.monthlyContribution, calculator.annualReturn, calculator.inflationRate, calculator.years]);
 
   const finalData = compoundInterestData[compoundInterestData.length - 1] || {
@@ -295,7 +243,7 @@ const InvestmentAdvice: React.FC = () => {
               <div className="mt-4 p-3 bg-muted/50 rounded-lg">
                 <p className="text-xs text-muted-foreground mb-2">{t("investment.breakdown.roi_label")}</p>
                 <p className="text-xl font-bold text-primary">
-                  {finalData.principal > 0 ? ((finalData.interest / finalData.principal) * 100).toFixed(1) : 0}%
+                  {calculateROI(finalData.principal, finalData.interest).toFixed(1)}%
                 </p>
               </div>
             </CardContent>

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { FinanceData, Income, Expense, Debt } from "@/types/finance";
+import { generateId, migrateExpenses, validateAndMigrateImportData } from "@/lib/import-export-utils";
 
 interface FinanceContextType {
   data: FinanceData;
@@ -47,10 +48,6 @@ const defaultData: FinanceData = {
   language: "en",
 };
 
-function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
 export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [data, setData] = useState<FinanceData>(defaultData);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -61,12 +58,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as FinanceData;
-        // Migration: Add default type to expenses that don't have it
-        const migratedExpenses = parsed.expenses.map((expense) => ({
-          ...expense,
-          type: expense.type || "need", // Default to "need" for backward compatibility
-        })) as Expense[];
-        setData({ ...parsed, expenses: migratedExpenses });
+        setData({ ...parsed, expenses: migrateExpenses(parsed.expenses) });
       } catch (e) {
         console.error("Failed to load finance data from session", e);
       }
@@ -161,41 +153,12 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const importData = (jsonString: string): boolean => {
-    try {
-      const parsed = JSON.parse(jsonString) as FinanceData;
-      // Basic validation
-      if (
-        Array.isArray(parsed.incomes) &&
-        Array.isArray(parsed.expenses) &&
-        Array.isArray(parsed.debts) &&
-        typeof parsed.language === "string"
-      ) {
-        // Migration: Add default type to expenses that don't have it
-        const migratedExpenses = parsed.expenses.map((expense) => ({
-          ...expense,
-          type: expense.type || "need", // Default to "need" for backward compatibility
-        })) as Expense[];
-
-        // Ensure selectedStrategy and customStrategy exist
-        const migratedData: FinanceData = {
-          ...parsed,
-          expenses: migratedExpenses,
-          selectedStrategy: parsed.selectedStrategy ?? null,
-          customStrategy: parsed.customStrategy ?? {
-            needs: 50,
-            wants: 30,
-            savings: 20,
-          },
-        };
-
-        setData(migratedData);
-        return true;
-      }
-      return false;
-    } catch (e) {
-      console.error("Failed to import data", e);
-      return false;
+    const result = validateAndMigrateImportData(jsonString);
+    if (result.success) {
+      setData(result.data);
+      return true;
     }
+    return false;
   };
 
   const clearData = () => {
