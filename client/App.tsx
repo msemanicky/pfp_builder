@@ -17,6 +17,9 @@ import SavingsStrategies from "./pages/SavingsStrategies";
 import ChartsAnalytics from "./pages/ChartsAnalytics";
 import InvestmentAdvice from "./pages/InvestmentAdvice";
 import NotFound from "./pages/NotFound";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import ContactUs from "./pages/ContactUs";
 
 const App = () => {
   return (
@@ -28,6 +31,9 @@ const App = () => {
           <Route path="/savings-strategies" element={<SavingsStrategies />} />
           <Route path="/charts" element={<ChartsAnalytics />} />
           <Route path="/investment" element={<InvestmentAdvice />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/contact" element={<ContactUs />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
