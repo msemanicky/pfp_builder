@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useFinance } from "@/context/FinanceContext";
 import { useTranslation } from "react-i18next";
@@ -21,6 +21,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { i18n, t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+
+  // Update document title when language changes
+  useEffect(() => {
+    document.title = t('app.title');
+  }, [i18n.language, t]);
 
   const languages = [
     { code: "en", name: "English" },
@@ -259,28 +264,28 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <h4 className="font-semibold mb-4 text-foreground">{t('layout.resources')}</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/privacy"
                     className="hover:text-foreground transition-colors"
                   >
                     {t('layout.privacy_policy')}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/terms"
                     className="hover:text-foreground transition-colors"
                   >
                     {t('layout.terms_of_service')}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/contact"
                     className="hover:text-foreground transition-colors"
                   >
                     {t('layout.contact_us')}
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
